@@ -1,0 +1,4 @@
+This is a Brave Rewards publisher verification file.
+
+Domain: jaygajjar.tk
+Token: 88582ca886d981c664c18be1f61673574ac84ecee85bd8558db7e3d06ef6814d
