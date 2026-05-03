@@ -1,620 +1,2719 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=0">
-    <title>Jay Gajjar</title> <!-- CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/jquery.pagepiling.css" rel="stylesheet">
-    <link href="css/owl.carousel.min.css" rel="stylesheet">
-    <link href="css/owl.theme.default.min.css" rel="stylesheet">
-    <link href="css/animate.min.css" rel="stylesheet"> <!-- Main CSS -->
-    <link href="css/style.css" rel="stylesheet">   
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="description" content="Jay Gajjar — Mobile App Developer. Flutter, Dart, Bloc, GetX, Firebase, GCP. 5+ years building cross-platform apps for Android & iOS.">
+<meta name="theme-color" content="#0B1020">
+<title>Jay Gajjar · widget tree</title>
 
+<!-- Open Graph / share preview -->
+<meta property="og:title" content="Jay Gajjar — Flutter Developer">
+<meta property="og:description" content="A portfolio that's actually a Flutter widget tree. Inspect the developer.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   Reset & root variables
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-0:        #07090F;
+  --bg-1:        #0B1020;
+  --bg-2:        #0F1530;
+  --panel:       #11172B;
+  --panel-2:     #161D36;
+  --border:      #232B47;
+  --border-soft: #1A2138;
+  --line:        #2C3654;
+
+  --text:        #E8EDF3;
+  --text-muted:  #8A95A8;
+  --text-dim:    #5A6478;
+
+  --flutter:     #54C5F8;   /* widget blue */
+  --stateful:    #FFB454;   /* stateful orange */
+  --container:   #82E59A;   /* container green */
+  --text-amber:  #FFCB6B;   /* text yellow */
+  --list-purple: #C792EA;   /* list purple */
+  --method-pink: #F78EAA;   /* method pink */
+  --prop:        #6FB7E8;   /* property cyan */
+  --warn:        #FF7A7A;
+
+  --radius-sm: 6px;
+  --radius:    10px;
+  --radius-lg: 16px;
+
+  --shadow-1: 0 2px 8px rgba(0,0,0,0.4);
+  --shadow-2: 0 8px 32px rgba(0,0,0,0.5);
+
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --body: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --display: 'Bricolage Grotesque', 'Manrope', sans-serif;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg-1);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+}
+
+/* atmospheric background */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(1100px 700px at 12% -5%,  rgba(84,197,248,0.10), transparent 60%),
+    radial-gradient(1000px 700px at 95% 110%, rgba(199,146,234,0.08), transparent 55%),
+    radial-gradient(700px  500px at 50% 50%,  rgba(255,180,84,0.04),  transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 36px 36px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============================================================
+   Loading / boot sequence
+   ============================================================ */
+#boot {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-0);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+#boot.done { opacity: 0; visibility: hidden; }
+
+.boot-inner {
+  width: 100%;
+  max-width: 640px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--text-muted);
+}
+.boot-line { white-space: pre-wrap; }
+.boot-line .prompt { color: var(--flutter); }
+.boot-line .ok     { color: var(--container); }
+.boot-line .accent { color: var(--text-amber); }
+.boot-line .dim    { color: var(--text-dim); }
+.boot-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: var(--flutter);
+  margin-left: 4px;
+  vertical-align: -2px;
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ============================================================
+   App layout
+   ============================================================ */
+.app {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: 44px 1fr 28px;
+  height: 100vh;
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.5s ease 0.2s;
+}
+.app.ready { opacity: 1; }
+
+/* ---- top bar ---- */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 16px;
+  background: linear-gradient(to bottom, var(--panel-2), var(--panel));
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: 0.2px;
+}
+.brand .dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--flutter);
+  box-shadow: 0 0 0 3px rgba(84,197,248,0.18), 0 0 10px rgba(84,197,248,0.6);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(84,197,248,0.18), 0 0 10px rgba(84,197,248,0.6); }
+  50%      { box-shadow: 0 0 0 3px rgba(84,197,248,0.28), 0 0 18px rgba(84,197,248,0.9); }
+}
+.brand .file { color: var(--text-muted); }
+.brand .file b { color: var(--text); font-weight: 600; }
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-left: 12px;
+}
+.tab {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.tab.active {
+  color: var(--flutter);
+  border-color: rgba(84,197,248,0.25);
+  background: rgba(84,197,248,0.07);
+}
+
+.spacer { flex: 1; }
+
+.actions { display: flex; align-items: center; gap: 8px; }
+.btn {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  padding: 6px 11px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.btn:hover { background: var(--panel-2); border-color: var(--line); }
+.btn.primary {
+  background: linear-gradient(to bottom, #54C5F8, #2DA8E0);
+  color: #062338;
+  border-color: rgba(84,197,248,0.6);
+  font-weight: 700;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 6px 18px rgba(84,197,248,0.25);
+}
+.btn.primary:hover { filter: brightness(1.05); }
+.btn .ic { width: 13px; height: 13px; flex-shrink: 0; }
+
+/* ---- main split ---- */
+.main {
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) 1fr;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ---- tree pane ---- */
+.tree-pane {
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tree-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tree-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.tree-controls {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+.icon-btn {
+  width: 24px; height: 24px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.icon-btn:hover { background: var(--panel-2); color: var(--text); border-color: var(--border); }
+.icon-btn svg { width: 12px; height: 12px; }
+
+.search-row {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.search {
+  width: 100%;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px 7px 28px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+  outline: none;
+  transition: border 0.15s, background 0.15s;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A95A8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><path d='m21 21-4.35-4.35'/></svg>");
+  background-repeat: no-repeat;
+  background-position: 9px center;
+  background-size: 13px 13px;
+}
+.search:focus { border-color: var(--flutter); background-color: var(--bg-1); }
+.search::placeholder { color: var(--text-dim); }
+
+/* ---- tree content ---- */
+.tree {
+  flex: 1;
+  overflow: auto;
+  padding: 8px 4px 24px 4px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.tree::-webkit-scrollbar { width: 8px; height: 8px; }
+.tree::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.tree::-webkit-scrollbar-thumb:hover { background: var(--line); }
+
+.node { position: relative; }
+.node-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 6px;
+  border-radius: 5px;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  transition: background 0.12s ease;
+  border: 1px solid transparent;
+}
+.node-row:hover { background: rgba(255,255,255,0.03); }
+.node-row.selected {
+  background: rgba(84,197,248,0.10);
+  border-color: rgba(84,197,248,0.30);
+}
+.node-row.selected .node-name { color: var(--flutter); }
+
+.chevron {
+  width: 14px; height: 14px;
+  flex-shrink: 0;
+  color: var(--text-dim);
+  transition: transform 0.18s ease;
+}
+.node.expanded > .node-row .chevron { transform: rotate(90deg); }
+.node.leaf > .node-row .chevron { visibility: hidden; }
+
+.type-badge {
+  width: 18px; height: 18px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--mono);
+  letter-spacing: -0.3px;
+}
+.type-badge.W   { background: rgba(84,197,248,0.18);  color: var(--flutter); }
+.type-badge.SW  { background: rgba(255,180,84,0.18);  color: var(--stateful); }
+.type-badge.C   { background: rgba(130,229,154,0.18); color: var(--container); }
+.type-badge.T   { background: rgba(255,203,107,0.18); color: var(--text-amber); }
+.type-badge.L   { background: rgba(199,146,234,0.18); color: var(--list-purple); }
+.type-badge.M   { background: rgba(247,142,170,0.18); color: var(--method-pink); }
+.type-badge.P   { background: rgba(111,183,232,0.18); color: var(--prop); }
+
+.node-name {
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.1px;
+}
+.node-name .paren { color: var(--text-dim); }
+.node-name .const { color: var(--list-purple); margin-right: 4px; font-style: italic; }
+.node-meta {
+  margin-left: auto;
+  font-size: 10.5px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  flex-shrink: 0;
+  padding-left: 8px;
+}
+.node-row.highlight::before {
+  content: "";
+  position: absolute;
+  left: -1px; top: 50%;
+  transform: translateY(-50%);
+  width: 2px; height: 60%;
+  background: var(--flutter);
+  border-radius: 2px;
+}
+
+.children {
+  display: none;
+  margin-left: 18px;
+  padding-left: 8px;
+  border-left: 1px dashed rgba(255,255,255,0.07);
+}
+.node.expanded > .children { display: block; }
+
+/* hidden nodes (search) */
+.node.hidden { display: none; }
+
+/* ---- detail pane ---- */
+.detail-pane {
+  overflow: auto;
+  background:
+    linear-gradient(to bottom, rgba(15,21,48,0.4), rgba(11,16,32,0.4)),
+    var(--bg-1);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.detail-pane::-webkit-scrollbar { width: 10px; }
+.detail-pane::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
+.detail-pane::-webkit-scrollbar-thumb:hover { background: var(--line); }
+
+.detail-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 22px;
+  background: rgba(11,16,32,0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+.detail-bar .crumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.detail-bar .crumb .sep { color: var(--text-dim); }
+.detail-bar .crumb .leaf { color: var(--flutter); font-weight: 600; }
+
+.detail {
+  padding: 28px 28px 64px;
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+/* fade-in for detail content */
+.detail > .fade-in {
+  animation: fadeUp 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* generic card */
+.card {
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-2);
+}
+.card + .card { margin-top: 16px; }
+
+/* code header on each detail */
+.code-head {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--border-soft);
+  border-left: 2px solid var(--flutter);
+  border-radius: 4px;
+  background: rgba(84,197,248,0.04);
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+.code-head .kw  { color: var(--list-purple); }
+.code-head .cls { color: var(--flutter); }
+.code-head .str { color: var(--text-amber); }
+.code-head .num { color: var(--container); }
+.code-head .com { color: var(--text-dim); font-style: italic; }
+.code-head .fn  { color: var(--method-pink); }
+
+/* identity card */
+.identity-card { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: center; }
+.avatar {
+  width: 96px; height: 96px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25), transparent 60%),
+    linear-gradient(135deg, #54C5F8 0%, #C792EA 60%, #FFCB6B 110%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 38px;
+  color: #07142a;
+  box-shadow: 0 10px 30px rgba(84,197,248,0.25);
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.identity-card h1 {
+  font-family: var(--display);
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.05;
+  color: var(--text);
+}
+.identity-card .role {
+  margin-top: 6px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--flutter);
+  letter-spacing: 0.3px;
+}
+.identity-card .loc {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tagline {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--border);
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--text);
+}
+.tagline strong { color: var(--text-amber); font-weight: 700; }
+
+/* contact strip */
+.contact-row {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  text-decoration: none;
+  transition: all 0.18s;
+}
+.chip:hover { border-color: var(--flutter); color: var(--flutter); transform: translateY(-1px); }
+.chip svg { width: 13px; height: 13px; }
+
+/* about prose */
+.prose p {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+.prose strong { color: var(--text-amber); font-weight: 700; }
+.prose em { color: var(--flutter); font-style: normal; }
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+.metric {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  position: relative;
+  overflow: hidden;
+}
+.metric .num {
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--flutter);
+  line-height: 1;
+  letter-spacing: -1px;
+}
+.metric .lbl {
+  margin-top: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+/* job/experience card */
+.job .job-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.job .role-name {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text);
+}
+.job .company {
+  color: var(--flutter);
+  font-weight: 600;
+}
+.job .date {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.job .desc {
+  margin-top: 4px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+.job ul {
+  list-style: none;
+  margin-top: 16px;
+}
+.job li {
+  position: relative;
+  padding: 6px 0 6px 22px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text);
+}
+.job li::before {
+  content: "▸";
+  position: absolute;
+  left: 4px;
+  top: 6px;
+  color: var(--flutter);
+  font-size: 13px;
+}
+.job li strong { color: var(--text-amber); font-weight: 700; }
+.job li em { color: var(--flutter); font-style: normal; font-weight: 600; }
+
+/* skills */
+.skill-group { margin-bottom: 22px; }
+.skill-group:last-child { margin-bottom: 0; }
+.skill-group h3 {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.skill-group h3::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--flutter);
+}
+.tag-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(84,197,248,0.07);
+  border: 1px solid rgba(84,197,248,0.18);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text);
+  letter-spacing: 0.2px;
+}
+.tag.alt {
+  background: rgba(199,146,234,0.07);
+  border-color: rgba(199,146,234,0.20);
+}
+.tag.alt2 {
+  background: rgba(255,203,107,0.07);
+  border-color: rgba(255,203,107,0.22);
+}
+.tag.alt3 {
+  background: rgba(130,229,154,0.07);
+  border-color: rgba(130,229,154,0.22);
+}
+
+/* contact section */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 6px;
+}
+.contact-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.18s;
+}
+.contact-card:hover {
+  border-color: var(--flutter);
+  background: rgba(84,197,248,0.05);
+  transform: translateY(-2px);
+}
+.contact-card .ico {
+  width: 38px; height: 38px;
+  border-radius: 9px;
+  background: rgba(84,197,248,0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--flutter);
+  flex-shrink: 0;
+}
+.contact-card .ico svg { width: 18px; height: 18px; }
+.contact-card .lab {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+.contact-card .val {
+  margin-top: 2px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+  word-break: break-all;
+}
+
+.cta-row {
+  margin-top: 22px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.cta-row .btn { font-size: 13px; padding: 10px 16px; }
+
+/* education simple */
+.edu {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.edu .cap {
+  font-size: 28px;
+  width: 56px; height: 56px;
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,203,107,0.10);
+  border: 1px solid rgba(255,203,107,0.22);
+  flex-shrink: 0;
+}
+.edu .deg {
+  font-family: var(--display);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text);
+}
+.edu .uni { font-size: 14px; color: var(--text-muted); margin-top: 2px; }
+.edu .yr {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--flutter);
+  white-space: nowrap;
+}
+
+/* welcome (default state) */
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 60vh;
+  padding: 40px 20px;
+}
+.welcome .glyph {
+  font-family: var(--display);
+  font-size: 80px;
+  font-weight: 800;
+  letter-spacing: -3px;
+  background: linear-gradient(135deg, #54C5F8, #C792EA, #FFCB6B);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+}
+.welcome h2 {
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 700;
+  margin-top: 18px;
+  color: var(--text);
+}
+.welcome p {
+  margin-top: 10px;
+  color: var(--text-muted);
+  font-size: 14.5px;
+  max-width: 460px;
+}
+.welcome .hint {
+  margin-top: 22px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px dashed var(--border);
+  border-radius: 999px;
+}
+.welcome .hint .key {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  padding: 2px 6px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--flutter);
+}
+
+/* ---- status bar ---- */
+.statusbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 14px;
+  background: var(--panel-2);
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  user-select: none;
+}
+.statusbar .seg {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.statusbar .seg .pill {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--container);
+  box-shadow: 0 0 6px rgba(130,229,154,0.55);
+}
+.statusbar .accent { color: var(--flutter); }
+.statusbar .right { margin-left: auto; display: flex; gap: 16px; }
+
+/* easter egg toast */
+.toast {
+  position: fixed;
+  bottom: 50px;
+  right: 20px;
+  background: var(--panel-2);
+  border: 1px solid var(--flutter);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--text);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 0 4px rgba(84,197,248,0.15);
+  z-index: 100;
+  max-width: 320px;
+  animation: slideIn 0.35s ease;
+}
+.toast .head {
+  font-family: var(--mono);
+  color: var(--flutter);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+@keyframes slideIn {
+  0% { transform: translateX(380px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+/* ============================================================
+   Tab views (Performance & Console)
+   ============================================================ */
+.tab { cursor: pointer; transition: all 0.15s; }
+.tab:hover:not(.active) {
+  color: var(--text);
+  background: rgba(255,255,255,0.03);
+}
+
+/* hide main split when not on Inspector tab */
+.app[data-view="performance"] .main,
+.app[data-view="console"] .main { display: none; }
+
+/* generic full-pane view */
+.full-view {
+  display: none;
+  position: relative;
+  z-index: 1;
+  overflow: auto;
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--border);
+}
+.app[data-view="performance"] .full-view.performance-view,
+.app[data-view="console"]     .full-view.console-view { display: block; }
+
+/* ---- PERFORMANCE VIEW ---- */
+.perf-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 26px 28px 60px;
+}
+
+.perf-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 18px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  flex-wrap: wrap;
+}
+.perf-toolbar .live-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--warn);
+  box-shadow: 0 0 8px rgba(255,122,122,0.7);
+  animation: livePulse 1.2s ease-in-out infinite;
+}
+@keyframes livePulse { 50% { opacity: 0.5; transform: scale(0.85); } }
+.perf-toolbar .label { color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+.perf-toolbar .val { color: var(--container); font-weight: 600; }
+.perf-toolbar .sep { color: var(--text-dim); }
+.perf-toolbar .ctrl-btn {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.perf-toolbar .ctrl-btn:hover { border-color: var(--flutter); color: var(--flutter); }
+
+.perf-section {
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.perf-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.perf-section-head h3 {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  color: var(--text-muted);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.perf-section-head h3::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--flutter);
+}
+.perf-section-head .pun {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* Frame time chart */
+.chart-wrap {
+  position: relative;
+  height: 180px;
+  background:
+    linear-gradient(to bottom, transparent 49.5%, rgba(255,180,84,0.18) 49.5%, rgba(255,180,84,0.18) 50.5%, transparent 50.5%),
+    linear-gradient(to bottom, transparent 79.5%, rgba(130,229,154,0.15) 79.5%, rgba(130,229,154,0.15) 80.5%, transparent 80.5%);
+  background-color: var(--bg-2);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.chart-wrap::before, .chart-wrap::after {
+  position: absolute;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.5px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  pointer-events: none;
+}
+.chart-wrap::before {
+  content: "16ms / 60fps";
+  top: calc(50% - 9px); right: 8px;
+  color: var(--stateful);
+  background: rgba(255,180,84,0.10);
+}
+.chart-wrap::after {
+  content: "8ms / 120fps";
+  top: calc(80% - 9px); right: 8px;
+  color: var(--container);
+  background: rgba(130,229,154,0.10);
+}
+#perf-chart {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.fps-readout {
+  position: absolute;
+  top: 10px; left: 12px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+.fps-readout .num {
+  display: inline-block;
+  min-width: 26px;
+  color: var(--container);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* Career metric cards */
+.career-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+.career-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+.career-card:hover {
+  border-color: var(--flutter);
+  transform: translateY(-2px);
+}
+.career-card .top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  margin-bottom: 8px;
+}
+.career-card .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--flutter);
+}
+.career-card.alt .dot { background: var(--stateful); }
+.career-card.alt2 .dot { background: var(--container); }
+.career-card.alt3 .dot { background: var(--list-purple); }
+.career-card.alt4 .dot { background: var(--method-pink); }
+.career-card.alt5 .dot { background: var(--text-amber); }
+
+.career-card .big {
+  font-family: var(--display);
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--text);
+  line-height: 1;
+}
+.career-card .big .unit {
+  font-size: 16px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-left: 3px;
+}
+.career-card .delta {
+  margin-top: 6px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--container);
+}
+.career-card .delta.warn { color: var(--stateful); }
+.career-card.alt .big { color: var(--stateful); }
+.career-card.alt2 .big { color: var(--container); }
+.career-card.alt3 .big { color: var(--list-purple); }
+.career-card.alt4 .big { color: var(--method-pink); }
+.career-card.alt5 .big { color: var(--text-amber); }
+
+/* mini bars (rebuilds chart) */
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 80px;
+  padding: 8px 0;
+}
+.bars .bar {
+  flex: 1;
+  background: linear-gradient(to top, var(--flutter), rgba(84,197,248,0.4));
+  border-radius: 3px 3px 0 0;
+  min-height: 10px;
+  position: relative;
+  transition: all 0.18s;
+  cursor: default;
+}
+.bars .bar:hover { filter: brightness(1.3); transform: scaleY(1.04); transform-origin: bottom; }
+.bars .bar::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.bars-wrap { padding-bottom: 18px; }
+
+.bars .bar.pop { background: linear-gradient(to top, var(--text-amber), rgba(255,203,107,0.4)); }
+
+/* ---- CONSOLE VIEW ---- */
+.console-wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 22px 24px 60px;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.console-window {
+  background: #06080F;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-2);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 180px);
+  min-height: 480px;
+}
+.console-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--border);
+}
+.console-titlebar .traffic {
+  display: flex; gap: 6px;
+}
+.console-titlebar .light {
+  width: 11px; height: 11px;
+  border-radius: 50%;
+}
+.console-titlebar .red    { background: #FF5F57; }
+.console-titlebar .yellow { background: #FEBC2E; }
+.console-titlebar .green  { background: #28C840; }
+.console-titlebar .ttl {
+  margin-left: 14px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+  letter-spacing: 0.4px;
+}
+
+.console-output {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  line-height: 1.65;
+}
+.console-output::-webkit-scrollbar { width: 8px; }
+.console-output::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.console-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text);
+}
+.console-line + .console-line { margin-top: 1px; }
+.console-line.cmd { color: var(--text); }
+.console-line.cmd .pre { color: var(--container); font-weight: 600; }
+.console-line.cmd .at  { color: var(--list-purple); }
+.console-line.cmd .path { color: var(--flutter); }
+.console-line.cmd .input { color: var(--text-amber); }
+.console-line.dim   { color: var(--text-dim); }
+.console-line.muted { color: var(--text-muted); }
+.console-line.ok    { color: var(--container); }
+.console-line.warn  { color: var(--stateful); }
+.console-line.err   { color: var(--warn); }
+.console-line.flutter { color: var(--flutter); }
+.console-line.purple { color: var(--list-purple); }
+.console-line.pink { color: var(--method-pink); }
+.console-line.amber { color: var(--text-amber); }
+
+/* inline span colors (so <span class="amber">x</span> inside a line works) */
+.console-output .pre     { color: var(--container); font-weight: 600; }
+.console-output .at      { color: var(--list-purple); }
+.console-output .path    { color: var(--flutter); }
+.console-output .input   { color: var(--text-amber); }
+.console-output .dim     { color: var(--text-dim); }
+.console-output .muted   { color: var(--text-muted); }
+.console-output .ok      { color: var(--container); }
+.console-output .warn    { color: var(--stateful); }
+.console-output .err     { color: var(--warn); }
+.console-output .flutter { color: var(--flutter); }
+.console-output .purple  { color: var(--list-purple); }
+.console-output .pink    { color: var(--method-pink); }
+.console-output .amber   { color: var(--text-amber); }
+.console-line strong { color: var(--text-amber); font-weight: 700; }
+.console-line a { color: var(--flutter); text-decoration: underline; text-decoration-color: rgba(84,197,248,0.4); text-underline-offset: 3px; }
+.console-line a:hover { text-decoration-color: var(--flutter); }
+
+.console-prompt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px 14px;
+  border-top: 1px solid var(--border-soft);
+  background: rgba(0,0,0,0.25);
+}
+.console-prompt .pre  { color: var(--container); font-weight: 600; flex-shrink: 0; }
+.console-prompt .at   { color: var(--list-purple); flex-shrink: 0; }
+.console-prompt .path { color: var(--flutter); flex-shrink: 0; }
+.console-prompt .arrow { color: var(--text-muted); flex-shrink: 0; }
+.console-prompt input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-amber);
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 2px 0;
+  caret-color: var(--flutter);
+}
+
+.kbd {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--text);
+  margin: 0 2px;
+}
+
+/* ASCII art container */
+.ascii {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--flutter);
+  white-space: pre;
+  margin: 4px 0 8px;
+}
+
+/* ============================================================
+   Mobile responsive
+   ============================================================ */
+@media (max-width: 820px) {
+  .app { grid-template-rows: 44px 1fr 26px; }
+  .main { grid-template-columns: 1fr; }
+  .tree-pane {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    max-height: 38vh;
+  }
+  .detail { padding: 22px 16px 48px; }
+  .identity-card { grid-template-columns: 1fr; text-align: left; }
+  .identity-card h1 { font-size: 30px; }
+  .avatar { width: 76px; height: 76px; font-size: 30px; border-radius: 18px; }
+  .tabs { display: none; }
+  .brand .file { display: none; }
+  .statusbar .seg.hide-sm { display: none; }
+  .welcome .glyph { font-size: 56px; }
+}
+@media (max-width: 480px) {
+  .topbar { padding: 0 10px; gap: 8px; }
+  .btn { padding: 5px 8px; font-size: 11px; }
+  .actions .btn .lbl { display: none; }
+  .actions .btn .ic { margin: 0; }
+  .perf-wrap { padding: 16px 14px 50px; }
+  .console-wrap { padding: 14px 12px 50px; }
+  .console-window { height: calc(100vh - 130px); }
+  .career-card .big { font-size: 26px; }
+  .chart-wrap { height: 140px; }
+}
+</style>
 </head>
+<body>
 
-<body class="body-piling is-dark">
-    <div class="wrapper">
-        <header id="header" class="header">
-            <div class="container-fluid">
-                <div class="brand"> <a href="/" class="brand-name">Jay <span class="brand-name-s">Gajjar</span></a>
-                </div> <button class="nav-toggle-btn a-nav-toggle"> <span class="hamburger"> <span
-                            class="top-bun"></span> <span class="meat"></span> <span class="bottom-bun"></span> </span>
-                </button>
-                <div class="hide-menu a-nav-toggle"></div>
-                <div class="menu">
-                    <div class="menu-lang"> <a href="#" class="menu-lang-item active">Eng.</a> </div>
-                    <div class="menu-main" id="accordion">
-                        <ul id="menuMain">
-                            <li data-menuanchor="About" class="active"><a href="#About">About</a></li>
-                            <li data-menuanchor="Services"><a href="#Services">Services</a></li>
-                            <li data-menuanchor="Skills"><a href="#Skills">Skills</a></li>
-                            <li data-menuanchor="Resume"><a href="#Resume">Resume</a></li>
-                            <li data-menuanchor="Testimonials"><a href="#Testimonials">Testimonials</a></li>
-                            <li data-menuanchor="Contact"><a href="#Contact">Contact</a></li>
-                        </ul>
-                    </div>
-                    <div class="menu-footer">
-                        <div class="menu-footer-contacts">
-                            <div class="menu-footer-mail"><a href="mailto:gajjarjay52@gmail.com"
-                                    class="mail-link">gajjarjay52@gmail.com</a></div>
-                        </div>
-                        <div class="menu-footer-copyright">&copy; All Rights Reseverd. And Design by <b>Sarthak
-                                Verma</b></div>
-                    </div>
-                    <div class="menu-ornament"></div>
-                </div>
-            </div>
-        </header>
-        <div id="content">
-            <div class="a-pagepiling full-page">
-                <div class="section pp-scrollable slide slide-about a-slide-typed" data-name="about">
-                    <div class="slide-container">
-                        <div class="lines">
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div class="parallax" id="a-parallax">
-                            <div class="layer shape shape2" data-depth="0.4">
-                                <div class="inside animate-element delay4 bounceIn"></div>
-                            </div>
-                            <div class="layer shape shape3" data-depth="0.5">
-                                <div class="inside animate-element delay5 bounceIn"></div>
-                            </div>
-                            <div class="layer shape shape4" data-depth="0.7">
-                                <div class="inside animate-element delay4 bounceIn"></div>
-                            </div>
-                            <div class="layer shape shape5" data-depth="0.9">
-                                <div class="inside animate-element delay5 bounceIn"></div>
-                            </div>
-                            <div class="layer shape shape6" data-depth="0.2">
-                                <div class="inside animate-element delay6 bounceIn"></div>
-                            </div>
-                            <div class="layer shape shape7" data-depth="0.3">
-                                <div class="inside animate-element delay3 bounceIn"></div>
-                            </div>
-                            <div class="layer shape shape8" data-depth="0.5">
-                                <div class="inside animate-element delay8 bounceIn"></div>
-                            </div>
-                            <div class="layer shape shape9" data-depth="0.5">
-                                <div class="inside animate-element delay9 bounceIn"></div>
-                            </div>
-                            <div class="layer shape shape10" data-depth="0.2">
-                                <div class="inside animate-element delay7 bounceIn"></div>
-                            </div>
-                            <div class="layer shape shape11" data-depth="0.3">
-                                <div class="inside animate-element delay8 bounceIn"></div>
-                            </div>
-                            <div class="layer shape shape12" data-depth="0.2">
-                                <div class="inside animate-element delay9 bounceIn"></div>
-                            </div>
-                            <div class="layer shape shape13" data-depth="0.2">
-                                <div class="inside animate-element delay10 bounceIn"></div>
-                            </div>
-                            <div class="layer shape shape14" data-depth="0.2">
-                                <div class="inside animate-element delay11 bounceIn"></div>
-                            </div>
-                            <div class="layer shape shape15" data-depth="0.2">
-                                <div class="inside animate-element delay12 bounceIn"></div>
-                            </div>
-                            <div class="layer shape shape16" data-depth="0.1">
-                                <div class="inside animate-element delay13 bounceIn"></div>
-                            </div>
-                            <div class="layer shape shape1" data-depth="0.6">
-                                <div class="inside animate-element delay4 bounceIn"></div>
-                            </div>
-                        </div>
-                        <div class="container">
-                            <div class="row justify-content-center text-center">
-                                <div class="col-lg-8">
-                                    <div class="animate-element delay5 fadeInUp">
-                                        <div class="title-mini text-primary">About me</div>
-                                        <h1 class="slide-title font-custom">Hello, I’m <span
-                                                class="text-typed a-typed a-typed-about"
-                                                data-text="Jay Gajjar"></span><br /> I’m a Flutter Developer.</h1>
-                                    </div>
-                                    <div class="slide-descr animate-element delay7 fadeInUp">I will help you
-                                        <strong>build stunning Mobile Apps</strong> and <strong>Web Apps</strong>.</div>
-                                    <div class="slide-photo slide-photo-about">
-                                        <div class="rounded-text"> <svg viewBox="0 0 200 200">
-                                                <path id="textPath" d="M 85,0 A 85,85 0 0 1 -85,0 A 85,85 0 0 1 85,0"
-                                                    transform="translate(100,100)" fill="none" stroke-width="0"></path>
-                                                <g font-size="18.5px"> <text text-anchor="start">
-                                                        <textPath xlink:href="#textPath" startOffset="0%">Mobile
-                                                            Development - Web Development - UI/UX Design -</textPath>
-                                                    </text> </g>
-                                            </svg> </div>
-                                        <div class="inside"><img src="img/slide1.png" alt="" /></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="section pp-scrollable slide slide-services slide-dark slide-services a-slide-typed"
-                    data-name="services">
-                    <div class="slide-container">
-                        <div class="lines">
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div class="container">
-                            <div class="row align-items-center">
-                                <div class="col-md-5">
-                                    <div class="animate-element delay5 fadeInUp">
-                                        <div class="title-mini text-primary">my services</div>
-                                        <h2 class="slide-title font-custom">Build <span
-                                                class="text-typed a-typed a-typed-services"
-                                                data-text="awesome apps"></span></h2>
-                                    </div>
-                                    <div class="slide-descr animate-element delay7 fadeInUp">Whether you are working on
-                                        a new startup or have an existing product, I'd love the opportunity to help you
-                                        and your team to <strong>solve your most challenging</strong> problems.</div>
-                                    <nav class="service-list animate-element delay9 fadeInUp">
-                                        <ul class="">
-                                            <li class="primary-link"><a href="#">Mobile Apps</a></li>
-                                            <li class="primary-link"><a href="#">Websites/Web Apps</a></li>
-                                            <li class="primary-link"><a href="#">UX & UI Design</a></li>
-                                            <li class="primary-link"><a href="#">Database and APIs</a></li>
-                                            <li class="primary-link"><a href="#">Branding Design</a></li>
-                                        </ul>
-                                    </nav>
-                                </div>
-                                <div class="col-md-1"></div>
-                                <div class="col-md-6">
-                                    <div class="slide-photo slide-photo-services">
-                                        <div class="inside"><img src="img/slide2.png" alt="" /></div>
-                                        <div class="image-card card2-1 animate-element delay8 fadeInRight">
-                                            <div class="image-card-body">
-                                                <div class="inside"><img src="img/card2-1.png" alt="" /></div>
-                                            </div>
-                                        </div>
-                                        <div class="image-card card2-2 animate-element delay9 fadeInUp">
-                                            <div class="image-card-body">
-                                                <div class="inside"><img src="img/card2-2.png" alt="" /></div>
-                                            </div>
-                                        </div>
-                                        <div class="image-card card2-3 animate-element delay10 fadeInUp">
-                                            <div class="image-card-body">
-                                                <div class="inside"><img src="img/card2-3.png" alt="" /></div>
-                                            </div>
-                                        </div>
-                                        <div
-                                            class="image-card image-card-dark card2-4 animate-element delay11 fadeInRight">
-                                            <div class="image-card-body">
-                                                <div class="inside"><img src="img/card2-4.png" alt="" /></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="section pp-scrollable slide slide-skills a-slide-typed" data-name="skills">
-                    <div class="slide-container">
-                        <div class="lines">
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div class="container">
-                            <div class="row align-items-center flex-row-reverse">
-                                <div class="col-md-5">
-                                    <div class="animate-element delay5 fadeInUp">
-                                        <div class="title-mini text-primary">my featured skills</div>
-                                        <h2 class="slide-title font-custom">I’m using <span
-                                                class="text-typed a-typed a-typed-skills"
-                                                data-text="top leading"></span><br /> development methods.</h2>
-                                    </div>
-                                    <div class="slide-descr animate-element delay7 fadeInUp">I specialize in helping
-                                        early stage startups validate their riskiest assumptions using <strong>leading
-                                            development and design methods</strong>. </div>
-                                    <div class="bar-list a-progressbar animate-element delay9 fadeInUp">
-                                        <div class="bar-item">
-                                            <div class="row">
-                                                <div class="col bar-item-title">Mobile Development - Flutter </div>
-                                                <div class="col-auto text-right bar-item-value">75%</div>
-                                            </div>
-                                            <div class="progress">
-                                                <div class="progress-bar" role="progressbar" aria-valuenow="75"
-                                                    aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                        <div class="bar-item">
-                                            <div class="row">
-                                                <div class="col bar-item-title">Dynamic Websites - PHP </div>
-                                                <div class="col-auto text-right bar-item-value">70%</div>
-                                            </div>
-                                            <div class="progress">
-                                                <div class="progress-bar" role="progressbar" aria-valuenow="70"
-                                                    aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                        <div class="bar-item">
-                                            <div class="row">
-                                                <div class="col bar-item-title">Databases - Firebase, MySQL, MongoDB
-                                                </div>
-                                                <div class="col-auto text-right bar-item-value">65%</div>
-                                            </div>
-                                            <div class="progress">
-                                                <div class="progress-bar" role="progressbar" aria-valuenow="65"
-                                                    aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                        <div class="bar-item">
-                                            <div class="row">
-                                                <div class="col bar-item-title">Backend - Nodejs</div>
-                                                <div class="col-auto text-right bar-item-value">50%</div>
-                                            </div>
-                                            <div class="progress">
-                                                <div class="progress-bar" role="progressbar" aria-valuenow="50"
-                                                    aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-1"></div>
-                                <div class="col-md-6">
-                                    <div class="slide-photo">
-                                        <div class="image-card card3-1 animate-element delay8 zoomIn">
-                                            <div class="image-card-body">
-                                                <div class="inside"><img src="img/slide3.png" alt="" /></div>
-                                            </div>
-                                        </div>
-                                        <div
-                                            class="image-card card3-2 image-card-dark animate-element delay12 fadeInUp">
-                                            <div class="image-card-body">
-                                                <div class="inside"><img src="img/card3-2.png" alt="" /></div>
-                                            </div>
-                                        </div>
-                                        <div class="image-card card3-3 animate-element delay9 fadeInUp">
-                                            <div class="image-card-body">
-                                                <div class="inside"><img src="img/card3-3.png" alt="" /></div>
-                                            </div>
-                                        </div>
-                                        <div class="image-card card3-4 animate-element delay13 fadeInLeft">
-                                            <div class="image-card-body">
-                                                <div class="inside"><img src="img/card3-4.png" alt="" /></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="section pp-scrollable slide slide-resume slide-dark">
-                    <div class="slide-container">
-                        <div class="lines">
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div class="container">
-                            <div class="row">
-                                <div class="col-md-1"></div>
-                                <div class="col-md-4">
-                                    <div class="slide-photo slide-photo-education">
-                                        <div
-                                            class="slide-photo-bg-rounded photo-bg-education animate-element delay5 bounceIn">
-                                            <div class="inside">
-                                                <div class="education-image"><img src="img/slide4-1.png" alt="" /></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="animate-element delay9 fadeInUp">
-                                        <h2 class="slide-title font-custom slide-title-margin-md">Education</h2>
-                                        <div class="vacancy-item">
-                                            <div class="vacancy-item-title"><a href="#">BCA in Information
-                                                    Technology</a></div>
-                                            <div class="vacancy-item-place">College</div>
-                                            <div class="vacancy-item-time text-primary">ZSPatel, Surat, GJ</div>
-                                            <div class="vacancy-item-text">Year of Passing: 2020<br>CPI: 7.60/10 <br>CGPA: 7.80/10
-                                            </div>
-                                        </div>
-<!--                                         <div class="vacancy-item">
-                                            <div class="vacancy-item-title"><a href="#">Intermediate</a></div>
-                                            <div class="vacancy-item-place">School</div>
-                                            <div class="vacancy-item-time text-primary">S V Vidhyalaya, Surat, GJ</div>
-                                            <div class="vacancy-item-text">Completed High School and Intermediate
-                                                School.</div>
-                                        </div> -->
-                                    </div>
-                                </div>
-                                <div class="col-md-2"></div>
-                                <div class="col-md-4">
-                                    <div class="slide-photo slide-photo-experience">
-                                        <div
-                                            class="slide-photo-bg-rounded photo-bg-experience animate-element delay7 bounceIn">
-                                            <div class="inside">
-                                                <div class="experience-image"><img src="img/slide4-2.png" alt="" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="animate-element delay11 fadeInUp">
-                                        <h2 class="slide-title font-custom slide-title-margin-md">Experience</h2>
-                                        <div class="vacancy-item">
-                                            <div class="vacancy-item-title"><a href="#">Senior Mobile Developer</a>
-                                            </div>
-                                            <div class="vacancy-item-place">ClusterSoftTech</div>
-                                            <div class="vacancy-item-time text-primary">jan 2020 - Present</div>
-                                            <div class="vacancy-item-text">Created multiple Mobile Apps and Web Apps.
-                                            </div>
-                                        </div>
-<!--                                         <div class="vacancy-item">
-                                            <div class="vacancy-item-title"><a href="#">Marketing </a></div>
-                                            <div class="vacancy-item-place">Gpay For Business</div>
-                                            <div class="vacancy-item-time text-primary">Mar 2019 - Dec 2020</div>
-                                            <div class="vacancy-item-text">Engage customers with offers and more when
-                                                you create a free custombusiness channel in the Google Pay app. </div>
-                                        </div> -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="section pp-scrollable slide slide-testimonials" data-name="testimonials">
-                    <div class="slide-container">
-                        <div class="lines">
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div class="container">
-                            <div class="row align-items-center flex-row-reverse">
-                                <div class="col-md-5">
-                                    <div class="animate-element delay5 fadeInUp">
-                                        <div class="title-mini title-mini-margin-lg text-primary">testimonials</div>
-                                        <h3 class="slide-title font-custom">Here's what people say about me...</h3>
-                                    </div>
-                                    <div
-                                        class="testimonial-carousel a-testimonial-carousel owl-carousel owl-theme animate-element delay7 fadeInUp">
-                                        <div class="testimonial-item">
-                                            <div class="slide-descr testimonial-item-text">Had a great experience with
-                                                Jay. He is very professional with his work. Looking forward to working
-                                                with him again in the near future!</div>
-                                            <div class="testimonial-item-author">
-                                                <div class="media">
-                                                    <div class="align-self-center mr-3">
-                                                        <div class="avatar testimonial-avatar">
-                                                            <div class="inside"
-                                                                style="background-image: url(img/ashish.jpg);">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="align-self-center media-body">
-                                                        <div class="testimonial-item-author-name"><a
-                                                                style="color: #fff;"
-                                                                href="https://www.linkedin.com/in/ashish-gajjar-3baa43a7/">Ashish
-                                                                Gajjar</a></div>
-                                                        <div class="testimonial-item-author-status">process Engineer at
-                                                            Sahajanand Medical Technology</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="testimonial-item">
-                                            <div class="slide-descr testimonial-item-text">Jay is great! When we vaguely
-                                                knew what we wanted to achieve he came back with solutions and then
-                                                implemented them with speed. I would definately recommend jay!</div>
-                                            <div class="testimonial-item-author">
-                                                <div class="media">
-                                                    <div class="align-self-center mr-3">
-                                                        <div class="avatar testimonial-avatar">
-                                                            <div class="inside"
-                                                                style="background-image: url(img/janak.jpg);"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="align-self-center media-body">
-                                                        <div class="testimonial-item-author-name"><a
-                                                                style="color: #fff;"
-                                                                href="https://www.linkedin.com/in/janak-rathod-445982155/">Janak
-                                                                Rathod</a></div>
-                                                        <div class="testimonial-item-author-status">React.js Developer
-                                                            at ClusterSoftTech</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="testimonial-item">
-                                            <div class="slide-descr testimonial-item-text">Jay did an excellent job and
-                                                delivered quickly. He even suggested improvements where relevant, and
-                                                when I asked for minor changes he carried them out without any hassle.
-                                            </div>
-                                            <div class="testimonial-item-author">
-                                                <div class="media">
-                                                    <div class="align-self-center mr-3">
-                                                        <div class="avatar testimonial-avatar">
-                                                            <div class="inside"
-                                                                style="background-image: url(img/prakash.jpg);">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="align-self-center media-body">
-                                                        <div class="testimonial-item-author-name"><a
-                                                                style="color: #fff;"
-                                                                href="https://www.instagram.com/vaghasiya_prakash_/">Prakash
-                                                                Vaghasiya</a></div>
-                                                        <div class="testimonial-item-author-status">iOs Developer at
-                                                            Staffingine LLC</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="testimonial-item">
-                                            <div class="slide-descr testimonial-item-text">Jay delivered a great product
-                                                and was an excellent companion during this journey from designing to
-                                                publishing my website. Thanks to him I also learnt a lot about the
-                                                business itself. He was very pacient and collaborative. Totally
-                                                recommended!</div>
-                                            <div class="testimonial-item-author">
-                                                <div class="media">
-                                                    <div class="align-self-center mr-3">
-                                                        <div class="avatar testimonial-avatar">
-                                                            <div class="inside"
-                                                                style="background-image: url(img/chandni.jpg);">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="align-self-center media-body">
-                                                        <div class="testimonial-item-author-name"><a
-                                                                style="color: #fff;"
-                                                                href="https://www.instagram.com/_.fire_queen.__/">Chandni
-                                                                Mehta</a></div>
-                                                        <div class="testimonial-item-author-status">Graphic Designer at
-                                                            snproweb</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-1"></div>
-                                <div class="col-md-6">
-                                    <div class="slide-photo slide-photo-testimonials">
-                                        <div class="inside"><img src="img/slide7.png" alt="" /></div>
-                                        <div
-                                            class="image-card image-card-primary card7-1 animate-element delay11 fadeInLeft">
-                                            <div class="image-card-body">
-                                                <div class="inside"><img src="img/card7-1.png" alt="" /></div>
-                                            </div>
-                                        </div>
-                                        <div class="image-card card7-2 animate-element delay8 fadeInLeft">
-                                            <div class="image-card-body">
-                                                <div class="inside"><img src="img/card7-2.png" alt="" /></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="section pp-scrollable slide slide-clients slide-dark">
-                    <div class="section pp-scrollable slide slide-contacts a-slide-typed" data-name="contacts">
-                        <div class="slide-container">
-                            <div class="lines">
-                                <div></div>
-                                <div></div>
-                                <div></div>
-                                <div></div>
-                            </div>
-                            <div class="contact-ornament"></div>
-                            <div class="container">
-                                <div class="row justify-content-center text-center">
-                                    <div class="col-lg-8">
-                                        <div class="animate-element delay5 fadeInUp">
-                                            <div class="title-mini text-primary">contact me</div>
-                                            <h1 class="slide-title font-custom">Are you ready to <span
-                                                    class="text-typed a-typed a-typed-contacts"
-                                                    data-text="work together?"></span></h1>
-                                        </div>
-                                        <div class="slide-descr animate-element delay7 fadeInUp">I’m always interested
-                                            in hearing about new projects and opportunities.<br /> You can <strong>tell
-                                                me about the problems</strong> you are trying to solve. I'd love to
-                                            listen and see if there's anything I can do to help you.</div>
-                                        <br>
-                                                <br>
-                                                <br>
-                                                <br>
-                                                    <a href="https://www.facebook.com/gajjar.jay.100/" class="myNewcss" target="_blank"><i class="myNewcss fa fa-facebook"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;
-                                                    <a href="https://www.github.com/j-j-gajjar" class="myNewcss" ><i class="fa fa-github"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;
-                                                    <a href="https://www.linkedin.com/in/jay-gajjar-04/" class="myNewcss" target="_blank"><i class="fa fa-linkedin"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;
-                                                    <a href="https://www.instagram.com/_j_j_gajjar/" class="myNewcss" target="_blank"><i class="fa fa-instagram"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;
-                                                    <a href="mailto:gajjarjay52@gmail.com" class="myNewcss" target="_blank"><i class="fa fa-envelope"></i></a>
-                                    </div>
-                                </div>
-                                <div
-                                    class="row align-items-center text-center contacts animate-element delay11 fadeInUp">
-                                    <div class="col-md-4">
-                                        <div class="contact-item"><a href="mailto:gajjarjay52@gmail.com"
-                                                class="mail-link">gajjarjay52@gmail.com</a></div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="contact-item">Surat, India</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <footer id="footer" class="footer">
-                <div class="container-fluid">
-                    <div class="copyright">© JAY 2020.</div>
-                    <div class="footer-social">
-                        <ul class="social">
-                           <li>  <a href="https://www.facebook.com/gajjar.jay.100/" class="myNewcss" target="_blank"><i class="myNewcss fa fa-facebook"></i></a></li>
-                            <li>       <a href="https://www.github.com/j-j-gajjar" class="myNewcss" ><i class="fa fa-github"></i></a></li>
-                            <li>      <a href="https://www.linkedin.com/in/jay-gajjar-04/"" class="myNewcss" target="_blank"><i class="fa fa-linkedin"></i></a></li>
-                            <li>        <a href="https://www.instagram.com/_j_j_gajjar/" class="myNewcss" target="_blank"><i class="fa fa-instagram"></i></a></li>
-                            <li>         <a href="mailto:gajjarjay52@gmail.com" class="myNewcss" target="_blank"><i class="fa fa-envelope"></i></a></li>
-                        </ul>
-                        <div class="chat"> </div>
-                    </div>
-            </footer>
-            <div class="progress-nav">
-                <ul id="menu">
-                    <li data-menuanchor="About" class="active"></li>
-                    <li data-menuanchor="Services"></li>
-                    <li data-menuanchor="Skills"></li>
-                    <li data-menuanchor="Resume"></li>
-                    <li data-menuanchor="Testimonials"></li>
-                    <li data-menuanchor="Contact"></li>
-                </ul>
-            </div>
+<!-- ============================================================
+     Boot screen
+     ============================================================ -->
+<div id="boot">
+  <div class="boot-inner">
+    <div id="boot-output"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     App
+     ============================================================ -->
+<div class="app" id="app" data-view="inspector">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <span class="file">portfolio /<b> jay_gajjar.dart</b></span>
+    </div>
+    <div class="tabs">
+      <span class="tab active" data-view="inspector">Widget Inspector</span>
+      <span class="tab" data-view="performance">Performance</span>
+      <span class="tab" data-view="console">Console</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="actions">
+      <button class="btn" id="expand-all" title="Expand all (Alt+E)">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/><polyline points="6 4 12 10 18 4"/></svg>
+        <span class="lbl">Expand</span>
+      </button>
+      <a class="btn" href="https://github.com/j-j-gajjar" target="_blank" rel="noopener" title="GitHub">
+        <svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.69-3.87-1.54-3.87-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.16 1.18a10.96 10.96 0 0 1 5.76 0c2.2-1.49 3.16-1.18 3.16-1.18.62 1.58.23 2.75.12 3.04.74.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14 0 1.55-.01 2.8-.01 3.18 0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5Z"/></svg>
+        <span class="lbl">GitHub</span>
+      </a>
+      <a class="btn primary" href="./jay_gajjar_resume.pdf" download title="Download resume">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span class="lbl">Resume</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TREE PANE -->
+    <aside class="tree-pane">
+      <div class="tree-header">
+        <span class="tree-title">Widget Tree</span>
+        <div class="tree-controls">
+          <button class="icon-btn" id="collapse-all" title="Collapse all">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <button class="icon-btn" id="expand-all-2" title="Expand all">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
         </div>
-        <div class="modal fade" id="request" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-body"> <button type="button" class="close" data-dismiss="modal"
-                            aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
-                        <form class="a-form" novalidate="novalidate">
-                            <div class="row">
-                                <div class="form-group col-sm-6"> <input type="text" class="form-control" name="name"
-                                        required="" placeholder="Name*" aria-required="true"> </div>
-                                <div class="form-group col-sm-6"> <input type="email" class="form-control" required=""
-                                        name="email" placeholder="Email*"> </div>
-                                <div class="form-group col-sm-12"> <input type="text" class="form-control"
-                                        name="subject" placeholder="Subject (Optinal)"> </div>
-                                <div class="form-group col-sm-12"> <textarea name="message" class="form-control"
-                                        required="" placeholder="Message*"></textarea> </div>
-                                <div class="form-group form-group-message col-sm-12"> <span id="success"
-                                        class="text-primary">Thank You, your message is successfully sent!</span> <span
-                                        id="error" class="text-primary">Sorry, something went wrong </span> </div>
-                                <div class="col-sm-12 text-center"><button type="submit" class="btn btn-dark">Contact
-                                        me</button></div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+      </div>
+      <div class="search-row">
+        <input type="text" class="search" id="search" placeholder="Filter widgets..." spellcheck="false" autocomplete="off"/>
+      </div>
+      <div class="tree" id="tree"></div>
+    </aside>
+
+    <!-- DETAIL PANE -->
+    <main class="detail-pane">
+      <div class="detail-bar">
+        <div class="crumb" id="crumb">
+          <span>portfolio</span><span class="sep">/</span>
+          <span class="leaf">welcome</span>
         </div>
-        <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-        <script>    window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')  </script>
-        <script src="js/smoothscroll.js"></script>
-        <script src="js/popper.min.js"></script>
-        <script src="js/bootstrap.min.js"></script>
-        <script src="js/owl.carousel.min.js"></script>
-        <script src="js/jquery.pagepiling.min.js"></script>
-        <script src="js/jquery.viewport.js"></script>
-        <script src="js/jquery.countdown.min.js"></script>
-        <script src="js/typed.min.js"></script>
-        <script src="js/parallax.min.js"></script>
-        <script src="js/jquery.validate.min.js"></script>
-        <script src="js/script.js"></script>
+      </div>
+      <div class="detail" id="detail"></div>
+    </main>
+
+  </div>
+
+  <!-- PERFORMANCE VIEW -->
+  <div class="full-view performance-view">
+    <div class="perf-wrap">
+
+      <div class="perf-toolbar">
+        <span class="live-dot"></span>
+        <span class="label">live</span>
+        <span class="val" id="perf-fps">60</span>
+        <span class="label">fps</span>
+        <span class="sep">·</span>
+        <span class="label">frame</span>
+        <span class="val" id="perf-frame">14.2</span>
+        <span class="label">ms</span>
+        <span class="sep">·</span>
+        <span class="label">jank</span>
+        <span class="val" id="perf-jank">0</span>
+        <button class="ctrl-btn" id="perf-pause">⏸ pause</button>
+      </div>
+
+      <div class="perf-section">
+        <div class="perf-section-head">
+          <h3>Frame Rendering Time</h3>
+          <span class="pun">// shipping smooth like 60fps for 5+ years</span>
+        </div>
+        <div class="chart-wrap">
+          <div class="fps-readout"><span class="num" id="perf-fps2">60</span> fps · <span id="perf-uptime">0s</span> uptime</div>
+          <canvas id="perf-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="perf-section">
+        <div class="perf-section-head">
+          <h3>Career Metrics</h3>
+          <span class="pun">// the only metrics that actually matter</span>
+        </div>
+        <div class="career-grid">
+          <div class="career-card">
+            <div class="top"><span class="dot"></span>Years Experience</div>
+            <div class="big" data-target="5" data-suffix="+">0<span class="unit">+</span></div>
+            <div class="delta">↑ steady growth</div>
+          </div>
+          <div class="career-card alt">
+            <div class="top"><span class="dot"></span>Apps Shipped</div>
+            <div class="big" data-target="10" data-suffix="+">0<span class="unit">+</span></div>
+            <div class="delta">↑ android & ios</div>
+          </div>
+          <div class="career-card alt2">
+            <div class="top"><span class="dot"></span>On-Device Faces Matched</div>
+            <div class="big" data-target="1000" data-suffix="+">0<span class="unit">+</span></div>
+            <div class="delta">↑ in seconds, locally</div>
+          </div>
+          <div class="career-card alt3">
+            <div class="top"><span class="dot"></span>Release Speed Gain</div>
+            <div class="big" data-target="40" data-suffix="%">0<span class="unit">%</span></div>
+            <div class="delta">↑ via flutter flavors</div>
+          </div>
+          <div class="career-card alt4">
+            <div class="top"><span class="dot"></span>Performance Lift</div>
+            <div class="big" data-target="25" data-suffix="%">0<span class="unit">%</span></div>
+            <div class="delta">↑ profiling + cleanup</div>
+          </div>
+          <div class="career-card alt5">
+            <div class="top"><span class="dot"></span>Hot Reloads</div>
+            <div class="big" data-target="9999" data-suffix="+">0<span class="unit">+</span></div>
+            <div class="delta">↑ and counting</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="perf-section">
+        <div class="perf-section-head">
+          <h3>Skill Distribution / Widget Rebuilds</h3>
+          <span class="pun">// where the cycles get spent</span>
+        </div>
+        <div class="bars-wrap">
+          <div class="bars" id="bars">
+            <div class="bar pop" style="height: 95%" data-label="flutter"></div>
+            <div class="bar"     style="height: 88%" data-label="dart"></div>
+            <div class="bar"     style="height: 78%" data-label="bloc"></div>
+            <div class="bar"     style="height: 72%" data-label="getx"></div>
+            <div class="bar"     style="height: 68%" data-label="firebase"></div>
+            <div class="bar"     style="height: 60%" data-label="gcp"></div>
+            <div class="bar"     style="height: 55%" data-label="ai apis"></div>
+            <div class="bar"     style="height: 48%" data-label="ci/cd"></div>
+            <div class="bar"     style="height: 40%" data-label="reactjs"></div>
+            <div class="bar"     style="height: 35%" data-label="node.js"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CONSOLE VIEW -->
+  <div class="full-view console-view">
+    <div class="console-wrap">
+      <div class="console-window">
+        <div class="console-titlebar">
+          <div class="traffic">
+            <span class="light red"></span>
+            <span class="light yellow"></span>
+            <span class="light green"></span>
+          </div>
+          <span class="ttl">jay@portfolio — flutter run · zsh</span>
+        </div>
+        <div class="console-output" id="console-output"></div>
+        <div class="console-prompt">
+          <span class="pre">jay@portfolio</span>
+          <span class="at">:</span>
+          <span class="path">~/portfolio</span>
+          <span class="arrow">$</span>
+          <input type="text" id="console-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="type 'help' to start..."/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="statusbar">
+    <span class="seg"><span class="pill"></span> hot reload connected</span>
+    <span class="seg hide-sm">·</span>
+    <span class="seg hide-sm">flutter <span class="accent">3.x</span> · dart <span class="accent">3.x</span></span>
+    <span class="seg hide-sm">·</span>
+    <span class="seg hide-sm">build #<span id="build-num">5247</span></span>
+    <span class="right">
+      <span class="seg" id="clock">--:--:--</span>
+      <span class="seg accent">flutter ❤</span>
+    </span>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   PORTFOLIO DATA — edit here to update content
+   ============================================================ */
+const ME = {
+  name: 'Jay Gajjar',
+  initials: 'JG',
+  role: 'Mobile App Developer',
+  location: 'Surat, Gujarat · India',
+  tagline: 'Building <strong>cross-platform Flutter apps</strong> for <em>Android & iOS</em> for the past 5+ years. Currently shipping AI-powered features at Terra.do.',
+  email: 'gajjarjay52@gmail.com',
+  phone: '+91 9574182452',
+  github: 'https://github.com/j-j-gajjar',
+  linkedin: 'https://www.linkedin.com/in/jjgajjar',
+  resume: './jay_gajjar_resume.pdf'
+};
+
+/* ============================================================
+   TREE STRUCTURE
+   types: W = Widget, SW = StatefulWidget, C = Container, T = Text, L = List, M = Method, P = Property
+   ============================================================ */
+const tree = {
+  id: 'root',
+  type: 'W',
+  name: 'MyPortfolio',
+  isConst: false,
+  expanded: true,
+  highlight: true,
+  detail: 'welcome',
+  children: [
+    {
+      id: 'identity',
+      type: 'C',
+      name: 'Identity()',
+      isConst: true,
+      expanded: false,
+      detail: 'identity',
+      children: [
+        { id: 'p-name',     type: 'P', name: "name: 'Jay Gajjar'", leaf: true, detail: 'identity' },
+        { id: 'p-role',     type: 'P', name: "role: 'Mobile App Developer'", leaf: true, detail: 'identity' },
+        { id: 'p-location', type: 'P', name: "location: 'Surat, Gujarat'", leaf: true, detail: 'identity' },
+        { id: 'p-exp',      type: 'P', name: "experience: '5+ years'", leaf: true, detail: 'identity' },
+      ]
+    },
+    {
+      id: 'about',
+      type: 'W',
+      name: 'About()',
+      detail: 'about',
+      leaf: true
+    },
+    {
+      id: 'experience',
+      type: 'L',
+      name: 'Experience()',
+      meta: '2 entries',
+      expanded: true,
+      detail: 'experience',
+      children: [
+        {
+          id: 'exp-terra',
+          type: 'SW',
+          name: 'TerraDo()',
+          meta: 'current',
+          highlight: true,
+          detail: 'experience-terra',
+          expanded: false,
+          children: [
+            { id: 't1', type: 'M', name: 'shipChatAndCommunity()', leaf: true, detail: 'experience-terra' },
+            { id: 't2', type: 'M', name: 'aiCourseRecommendations()', leaf: true, detail: 'experience-terra' },
+            { id: 't3', type: 'M', name: 'personalizedLearningPathways()', leaf: true, detail: 'experience-terra' },
+            { id: 't4', type: 'M', name: 'ttsAudioAutomation()', leaf: true, detail: 'experience-terra' },
+            { id: 't5', type: 'M', name: 'faceRecognitionModule()', leaf: true, detail: 'experience-terra' },
+            { id: 't6', type: 'M', name: 'releaseManagement()', leaf: true, detail: 'experience-terra' },
+            { id: 't7', type: 'M', name: 'thirdPartyIntegrations()', leaf: true, detail: 'experience-terra' },
+          ]
+        },
+        {
+          id: 'exp-univ',
+          type: 'W',
+          name: 'UniverseTech()',
+          meta: 'feb–oct 21',
+          detail: 'experience-univ',
+          leaf: true
+        }
+      ]
+    },
+    {
+      id: 'skills',
+      type: 'L',
+      name: 'Skills()',
+      meta: '6 groups',
+      detail: 'skills',
+      expanded: false,
+      children: [
+        { id: 's1', type: 'T', name: "'Mobile · Flutter, Dart, Bloc, GetX'", leaf: true, detail: 'skills' },
+        { id: 's2', type: 'T', name: "'AI · LLM APIs, TTS, Recommenders'", leaf: true, detail: 'skills' },
+        { id: 's3', type: 'T', name: "'Backend · Firebase, Firestore'", leaf: true, detail: 'skills' },
+        { id: 's4', type: 'T', name: "'Cloud · GCP, Pub/Sub, Functions'", leaf: true, detail: 'skills' },
+        { id: 's5', type: 'T', name: "'DevOps · GH Actions, Codemagic'", leaf: true, detail: 'skills' },
+        { id: 's6', type: 'T', name: "'Tools · MixPanel, Sentry, Intercom'", leaf: true, detail: 'skills' },
+      ]
+    },
+    {
+      id: 'projects',
+      type: 'L',
+      name: 'Projects()',
+      meta: '3 items',
+      detail: 'projects',
+      leaf: true
+    },
+    {
+      id: 'education',
+      type: 'W',
+      name: 'Education()',
+      detail: 'education',
+      leaf: true
+    },
+    {
+      id: 'contact',
+      type: 'C',
+      name: 'Contact()',
+      isConst: false,
+      expanded: false,
+      detail: 'contact',
+      highlight: true,
+      children: [
+        { id: 'c-email', type: 'P', name: "email: 'gajjarjay52@gmail.com'", leaf: true, detail: 'contact' },
+        { id: 'c-phone', type: 'P', name: "phone: '+91 9574182452'", leaf: true, detail: 'contact' },
+        { id: 'c-gh',    type: 'P', name: "github: 'j-j-gajjar'", leaf: true, detail: 'contact' },
+        { id: 'c-li',    type: 'P', name: "linkedin: 'jjgajjar'", leaf: true, detail: 'contact' },
+      ]
+    }
+  ]
+};
+
+/* ============================================================
+   DETAIL VIEWS
+   Each view returns HTML string for the right panel.
+   ============================================================ */
+const views = {
+  welcome: () => `
+    <div class="fade-in">
+      <div class="welcome">
+        <div class="glyph">&lt;/&gt;</div>
+        <h2>Inspect the developer.</h2>
+        <p>This portfolio is a Flutter widget tree. Click any node on the left to expand its branch and read about that part of who I am.</p>
+        <p class="hint"><span class="key">↓</span> start with <span style="color:var(--flutter)">MyPortfolio → About</span></p>
+      </div>
+    </div>
+  `,
+
+  identity: () => `
+    <div class="fade-in">
+      <div class="code-head"><span class="kw">const</span> <span class="cls">Identity</span>({
+  <span class="fn">name</span>: <span class="str">'${ME.name}'</span>,
+  <span class="fn">role</span>: <span class="str">'${ME.role}'</span>,
+  <span class="fn">location</span>: <span class="str">'${ME.location}'</span>,
+  <span class="fn">yearsOfExperience</span>: <span class="num">5</span>,
+});</div>
+
+      <div class="card">
+        <div class="identity-card">
+          <div class="avatar">${ME.initials}</div>
+          <div>
+            <h1>${ME.name}</h1>
+            <div class="role">${ME.role}</div>
+            <div class="loc">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              ${ME.location}
+            </div>
+          </div>
+        </div>
+        <div class="tagline">${ME.tagline}</div>
+        <div class="contact-row">
+          <a class="chip" href="mailto:${ME.email}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>${ME.email}</a>
+          <a class="chip" href="${ME.github}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.69-3.87-1.54-3.87-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.16 1.18a10.96 10.96 0 0 1 5.76 0c2.2-1.49 3.16-1.18 3.16-1.18.62 1.58.23 2.75.12 3.04.74.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14 0 1.55-.01 2.8-.01 3.18 0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5Z"/></svg>j-j-gajjar</a>
+          <a class="chip" href="${ME.linkedin}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S.02 4.88.02 3.5 1.13 1 2.5 1s2.48 1.12 2.48 2.5ZM.22 8h4.56V23H.22V8Zm7.4 0h4.37v2.05h.06c.61-1.16 2.1-2.39 4.32-2.39 4.62 0 5.47 3.04 5.47 6.99V23h-4.56v-6.55c0-1.56-.03-3.57-2.18-3.57-2.18 0-2.51 1.7-2.51 3.46V23H7.62V8Z"/></svg>jjgajjar</a>
+          <a class="chip" href="tel:${ME.phone.replace(/\s/g,'')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${ME.phone}</a>
+        </div>
+      </div>
+    </div>
+  `,
+
+  about: () => `
+    <div class="fade-in">
+      <div class="code-head"><span class="com">/// Build the developer.</span>
+<span class="cls">@override</span>
+<span class="cls">Widget</span> <span class="fn">build</span>(<span class="cls">BuildContext</span> context) {
+  <span class="kw">return</span> <span class="cls">About</span>(<span class="fn">developer</span>: <span class="cls">JayGajjar</span>());
+}</div>
+
+      <div class="card prose">
+        <p>I'm a <strong>Mobile App Developer</strong> with <strong>5+ years</strong> of hands-on experience building Flutter and cross-platform apps that ship on time, scale clean, and feel great to use.</p>
+        <p>I specialize in turning ambiguous product ideas into <em>polished Android and iOS experiences</em> — with strong fundamentals in <strong>state management</strong>, <strong>performance</strong>, and <strong>architecture</strong>, plus growing expertise in <em>AI integrations</em> and <em>cloud infrastructure</em>.</p>
+        <p>Currently bridging mobile + AI at Terra.do — designing app experiences where AI feels invisible and useful, not gimmicky.</p>
+
+        <div class="metrics">
+          <div class="metric"><div class="num">5+</div><div class="lbl">Years experience</div></div>
+          <div class="metric"><div class="num">2</div><div class="lbl">Production teams</div></div>
+          <div class="metric"><div class="num">10+</div><div class="lbl">Apps shipped</div></div>
+          <div class="metric"><div class="num">∞</div><div class="lbl">Hot reloads</div></div>
+        </div>
+      </div>
+    </div>
+  `,
+
+  experience: () => `
+    <div class="fade-in">
+      <div class="code-head"><span class="kw">final</span> experience = <span class="cls">List</span>&lt;<span class="cls">Job</span>&gt;[
+  <span class="cls">TerraDo</span>(<span class="com">/* current */</span>),
+  <span class="cls">UniverseTechnologies</span>(),
+];</div>
+
+      <div class="card job">
+        <div class="job-head">
+          <div class="role-name">Software Developer · <span class="company">Terra.do</span></div>
+          <div class="date">Oct 2021 — Present</div>
+        </div>
+        <div class="desc">Climate-tech learning platform. Cohort-based courses, community, AI-personalized pathways.</div>
+        <ul>
+          <li>Developed and scaled <strong>core Terra.do app features</strong> — chat, post creation, community interactions — for real-time engagement.</li>
+          <li>Integrated <em>AI-powered course recommendations</em> using user profile, interests & history → improved discovery and enrollment.</li>
+          <li>Built <em>personalized AI learning pathways</em> that dynamically generate tailored course sequences from user goals & skill gaps.</li>
+          <li>Automated <em>course content → Text-to-Speech (TTS)</em> audio pipeline → on-the-go listening, big accessibility win.</li>
+          <li>Implemented a <strong>face recognition</strong> module for a school app — matched <strong>1,000+ stored faces locally within a couple of seconds</strong>, fully on-device.</li>
+          <li>Architected with <strong>Bloc & GetX</strong> state management — robust, scalable, smooth UI/UX across Android & iOS.</li>
+          <li>Owned <strong>end-to-end release cycles</strong> (TestFlight, Play Store, App Store) with zero-downtime rollouts.</li>
+          <li>Automated third-party integrations — <em>MixPanel, Firebase, Sentry, Intercom, RudderStack, Flagsmith, ShakeBugs</em>.</li>
+        </ul>
+      </div>
+
+      <div class="card job">
+        <div class="job-head">
+          <div class="role-name">Flutter Developer · <span class="company">Universe Technologies</span></div>
+          <div class="date">Feb 2021 — Oct 2021</div>
+        </div>
+        <div class="desc">Software services. Custom mobile and web for clients across multiple domains.</div>
+        <ul>
+          <li>Developed and maintained multiple <strong>Flutter mobile and Flutter Web apps</strong>, with consistent on-time releases.</li>
+          <li>Led the <em>Ionic → Flutter migration</em> — improved maintainability, performance, and cross-platform consistency.</li>
+          <li>Implemented Flutter app <strong>flavors for multi-environment builds</strong> → release speed up <strong>~40%</strong>.</li>
+          <li>Optimized app performance by <strong>~25%</strong> through profiling, bug resolution, and code improvements.</li>
+          <li>Integrated <em>Firebase & Firestore</em> for secure real-time data sync.</li>
+        </ul>
+      </div>
+    </div>
+  `,
+
+  'experience-terra': () => views.experience(),
+  'experience-univ':  () => views.experience(),
+
+  skills: () => `
+    <div class="fade-in">
+      <div class="code-head"><span class="kw">final</span> skills = <span class="cls">SkillSet</span>(
+  <span class="fn">categories</span>: [<span class="str">'mobile'</span>, <span class="str">'ai'</span>, <span class="str">'backend'</span>, <span class="str">'cloud'</span>, <span class="str">'devops'</span>, <span class="str">'tools'</span>],
+);</div>
+
+      <div class="card">
+        <div class="skill-group">
+          <h3>Mobile App Development</h3>
+          <div class="tag-grid">
+            <span class="tag">Flutter</span><span class="tag">Dart</span><span class="tag">Bloc</span>
+            <span class="tag">GetX</span><span class="tag">Provider</span><span class="tag">Flutter Web</span>
+            <span class="tag">Flutter Flavors</span><span class="tag">Android</span><span class="tag">iOS</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h3>AI Integrations</h3>
+          <div class="tag-grid">
+            <span class="tag alt">LLM APIs</span><span class="tag alt">OpenAI</span><span class="tag alt">Gemini</span>
+            <span class="tag alt">Recommendation Systems</span><span class="tag alt">Text-to-Speech</span>
+            <span class="tag alt">Personalized Pathways</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h3>Backend & Databases</h3>
+          <div class="tag-grid">
+            <span class="tag alt3">Firebase</span><span class="tag alt3">Firestore</span><span class="tag alt3">Realtime DB</span>
+            <span class="tag alt3">SQL</span><span class="tag alt3">NoSQL</span><span class="tag alt3">Node.js</span>
+            <span class="tag alt3">REST APIs</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h3>Cloud & Infrastructure</h3>
+          <div class="tag-grid">
+            <span class="tag alt2">Google Cloud Platform</span><span class="tag alt2">VPC</span>
+            <span class="tag alt2">Load Balancer</span><span class="tag alt2">Firewall</span>
+            <span class="tag alt2">VM</span><span class="tag alt2">Pub/Sub</span><span class="tag alt2">Cloud Functions</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h3>CI/CD & DevOps</h3>
+          <div class="tag-grid">
+            <span class="tag">GitHub Actions</span><span class="tag">Codemagic</span>
+            <span class="tag">Buddy</span><span class="tag">TestFlight</span>
+            <span class="tag">Play Store</span><span class="tag">App Store Connect</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h3>Third-Party Tools & Integrations</h3>
+          <div class="tag-grid">
+            <span class="tag alt">GetStream</span><span class="tag alt">Flagsmith</span><span class="tag alt">Sentry</span>
+            <span class="tag alt">MixPanel</span><span class="tag alt">RudderStack</span>
+            <span class="tag alt">Intercom</span><span class="tag alt">Adjust</span><span class="tag alt">ShakeBug</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+
+  projects: () => `
+    <div class="fade-in">
+      <div class="code-head"><span class="kw">final</span> projects = [
+  <span class="cls">TerraDoApp</span>(),
+  <span class="cls">SchoolFaceRecognition</span>(),
+  <span class="cls">IonicToFlutterMigration</span>(),
+];</div>
+
+      <div class="card job">
+        <div class="job-head">
+          <div class="role-name">Terra.do — Climate Education Mobile App</div>
+          <div class="date">Production</div>
+        </div>
+        <div class="desc">Cross-platform Flutter app for cohort-based climate learning.</div>
+        <ul>
+          <li>Core features: chat, community posts, course discovery, AI recommendations.</li>
+          <li>AI-personalized learning pathways generated from user goals & skill gaps.</li>
+          <li>TTS audio pipeline for course content.</li>
+          <li><em>Stack:</em> Flutter · Bloc · GetX · Firebase · GetStream · GCP · OpenAI/Gemini.</li>
+        </ul>
+      </div>
+
+      <div class="card job">
+        <div class="job-head">
+          <div class="role-name">School App — On-Device Face Recognition</div>
+          <div class="date">Shipped</div>
+        </div>
+        <div class="desc">Privacy-first attendance/identification module.</div>
+        <ul>
+          <li>Matches <strong>1,000+ stored faces locally</strong> within a couple of seconds.</li>
+          <li>Fully on-device — zero cloud cost, full data privacy, offline-capable.</li>
+          <li><em>Stack:</em> Flutter · Dart · third-party face recognition library · local storage.</li>
+        </ul>
+      </div>
+
+      <div class="card job">
+        <div class="job-head">
+          <div class="role-name">Ionic → Flutter Migration</div>
+          <div class="date">Completed</div>
+        </div>
+        <div class="desc">Re-architected a production Ionic app to Flutter.</div>
+        <ul>
+          <li>Implemented Flutter flavors (dev/staging/prod) → release speed up <strong>~40%</strong>.</li>
+          <li>Optimized app performance by <strong>~25%</strong>.</li>
+          <li><em>Stack:</em> Flutter · Dart · Firebase · Flutter Flavors.</li>
+        </ul>
+      </div>
+    </div>
+  `,
+
+  education: () => `
+    <div class="fade-in">
+      <div class="code-head"><span class="kw">final</span> education = <span class="cls">Education</span>(
+  <span class="fn">degree</span>: <span class="str">'Bachelor of Computer Application'</span>,
+  <span class="fn">university</span>: <span class="str">'Veer Narmad South Gujarat University'</span>,
+  <span class="fn">years</span>: <span class="num">2017</span>..<span class="num">2020</span>,
+);</div>
+      <div class="card">
+        <div class="edu">
+          <div class="cap">🎓</div>
+          <div>
+            <div class="deg">Bachelor of Computer Application</div>
+            <div class="uni">Veer Narmad South Gujarat University · Surat, Gujarat</div>
+          </div>
+          <div class="yr">2017 — 2020</div>
+        </div>
+      </div>
+    </div>
+  `,
+
+  contact: () => `
+    <div class="fade-in">
+      <div class="code-head"><span class="kw">void</span> <span class="fn">getInTouch</span>() <span class="kw">async</span> {
+  <span class="kw">await</span> <span class="cls">launchUrl</span>(<span class="str">'mailto:${ME.email}'</span>);
+  <span class="com">// or pick any channel below 👇</span>
+}</div>
+
+      <div class="card">
+        <div class="contact-grid">
+          <a class="contact-card" href="mailto:${ME.email}">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+            <div><div class="lab">Email</div><div class="val">${ME.email}</div></div>
+          </a>
+          <a class="contact-card" href="${ME.github}" target="_blank" rel="noopener">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.69-3.87-1.54-3.87-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.16 1.18a10.96 10.96 0 0 1 5.76 0c2.2-1.49 3.16-1.18 3.16-1.18.62 1.58.23 2.75.12 3.04.74.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14 0 1.55-.01 2.8-.01 3.18 0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5Z"/></svg></div>
+            <div><div class="lab">GitHub</div><div class="val">github.com/j-j-gajjar</div></div>
+          </a>
+          <a class="contact-card" href="${ME.linkedin}" target="_blank" rel="noopener">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S.02 4.88.02 3.5 1.13 1 2.5 1s2.48 1.12 2.48 2.5ZM.22 8h4.56V23H.22V8Zm7.4 0h4.37v2.05h.06c.61-1.16 2.1-2.39 4.32-2.39 4.62 0 5.47 3.04 5.47 6.99V23h-4.56v-6.55c0-1.56-.03-3.57-2.18-3.57-2.18 0-2.51 1.7-2.51 3.46V23H7.62V8Z"/></svg></div>
+            <div><div class="lab">LinkedIn</div><div class="val">linkedin.com/in/jjgajjar</div></div>
+          </a>
+          <a class="contact-card" href="tel:${ME.phone.replace(/\s/g,'')}">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+            <div><div class="lab">Phone</div><div class="val">${ME.phone}</div></div>
+          </a>
+        </div>
+        <div class="cta-row">
+          <a class="btn primary" href="${ME.resume}" download>
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Resume PDF
+          </a>
+          <a class="btn" href="mailto:${ME.email}?subject=Hi%20Jay">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Send a message
+          </a>
+        </div>
+      </div>
+    </div>
+  `,
+};
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const TYPE_LABEL = { W:'W', SW:'W', C:'C', T:'T', L:'L', M:'M', P:'P' };
+const TYPE_TITLE = {
+  W: 'StatelessWidget', SW: 'StatefulWidget',
+  C: 'Container', T: 'Text',
+  L: 'List/Column/Row', M: 'Method', P: 'Property'
+};
+
+let selectedId = null;
+
+function renderTree(node, depth = 0) {
+  const hasChildren = node.children && node.children.length;
+  const expandedClass = node.expanded ? ' expanded' : '';
+  const leafClass = (node.leaf || !hasChildren) ? ' leaf' : '';
+  const highlightClass = node.highlight ? ' highlight' : '';
+
+  const constSpan = node.isConst ? '<span class="const">const</span>' : '';
+  const nameHtml = node.name.replace(/\(\)/g, '<span class="paren">()</span>');
+
+  let html = `<div class="node${expandedClass}${leafClass}" data-id="${node.id}">`;
+  html += `  <div class="node-row${highlightClass}" data-id="${node.id}" data-detail="${node.detail || ''}">`;
+  html += `    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+  html += `    <span class="type-badge ${node.type}" title="${TYPE_TITLE[node.type] || ''}">${TYPE_LABEL[node.type] || '·'}</span>`;
+  html += `    <span class="node-name">${constSpan}${nameHtml}</span>`;
+  if (node.meta) html += `<span class="node-meta">${node.meta}</span>`;
+  html += `  </div>`;
+
+  if (hasChildren) {
+    html += `<div class="children">`;
+    for (const child of node.children) html += renderTree(child, depth + 1);
+    html += `</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function attachNodeHandlers() {
+  document.querySelectorAll('.node-row').forEach(row => {
+    row.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = row.dataset.id;
+      const detail = row.dataset.detail;
+      const nodeEl = row.parentElement;
+
+      // toggle expand if has children
+      if (!nodeEl.classList.contains('leaf')) {
+        nodeEl.classList.toggle('expanded');
+      }
+
+      // select + show detail
+      document.querySelectorAll('.node-row.selected').forEach(r => r.classList.remove('selected'));
+      row.classList.add('selected');
+      selectedId = id;
+
+      if (detail && views[detail]) {
+        showDetail(detail, row);
+      }
+    });
+  });
+}
+
+function showDetail(key, sourceRow) {
+  const target = document.getElementById('detail');
+  target.innerHTML = views[key]();
+  // update breadcrumb
+  const crumb = document.getElementById('crumb');
+  const label = key.replace(/-/g, ' › ');
+  crumb.innerHTML = `<span>portfolio</span><span class="sep">/</span><span class="leaf">${label}</span>`;
+  // smooth scroll to top of detail
+  document.querySelector('.detail-pane').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ============================================================
+   SEARCH FILTER
+   ============================================================ */
+const search = document.getElementById('search');
+search.addEventListener('input', () => {
+  const q = search.value.trim().toLowerCase();
+  const all = document.querySelectorAll('.node');
+  if (!q) {
+    all.forEach(n => n.classList.remove('hidden'));
+    return;
+  }
+  // first hide everything, then unhide matching + ancestors
+  all.forEach(n => n.classList.add('hidden'));
+  all.forEach(n => {
+    const name = n.querySelector(':scope > .node-row .node-name').textContent.toLowerCase();
+    if (name.includes(q)) {
+      // unhide self + all ancestors
+      let cur = n;
+      while (cur && cur.classList && cur.classList.contains('node')) {
+        cur.classList.remove('hidden');
+        if (cur.children && cur.children.length > 1) cur.classList.add('expanded');
+        cur = cur.parentElement?.parentElement; // jump out of .children to parent .node
+      }
+      // also show direct children of matched
+      n.querySelectorAll('.node').forEach(c => c.classList.remove('hidden'));
+    }
+  });
+});
+
+/* ============================================================
+   EXPAND/COLLAPSE ALL
+   ============================================================ */
+document.getElementById('expand-all').addEventListener('click', () => {
+  document.querySelectorAll('.node:not(.leaf)').forEach(n => n.classList.add('expanded'));
+});
+document.getElementById('expand-all-2').addEventListener('click', () => {
+  document.querySelectorAll('.node:not(.leaf)').forEach(n => n.classList.add('expanded'));
+});
+document.getElementById('collapse-all').addEventListener('click', () => {
+  document.querySelectorAll('.node:not(.leaf)').forEach((n, i) => {
+    if (n.dataset.id !== 'root') n.classList.remove('expanded');
+  });
+});
+
+/* ============================================================
+   CLOCK
+   ============================================================ */
+function tick() {
+  const d = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  document.getElementById('clock').textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+setInterval(tick, 1000); tick();
+
+/* ============================================================
+   EASTER EGG: type "flutter" anywhere
+   ============================================================ */
+let buf = '';
+window.addEventListener('keydown', (e) => {
+  if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+  if (e.key.length !== 1) return;
+  buf = (buf + e.key.toLowerCase()).slice(-10);
+  if (buf.endsWith('flutter')) {
+    showToast('flutter doctor', '✓ All looks good. ❤️ from a Flutter dev.');
+    buf = '';
+  }
+  if (buf.endsWith('jay')) {
+    showToast('hire jay', 'Tap the Resume button up top → 📄');
+    buf = '';
+  }
+});
+function showToast(head, body) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `<div class="head">${head}</div><div>${body}</div>`;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(380px)'; t.style.transition = 'all 0.4s'; }, 3200);
+  setTimeout(() => t.remove(), 3700);
+}
+
+/* ============================================================
+   BOOT SEQUENCE
+   ============================================================ */
+const bootLines = [
+  { html: `<span class="prompt">$</span> git clone https://github.com/j-j-gajjar/portfolio.git`, delay: 80 },
+  { html: `<span class="dim">Cloning into 'portfolio'...</span>`, delay: 350 },
+  { html: `<span class="prompt">$</span> cd portfolio && flutter pub get`, delay: 380 },
+  { html: `<span class="dim">Resolving dependencies...</span>`, delay: 250 },
+  { html: `<span class="ok">✓</span> Got dependencies!`, delay: 300 },
+  { html: `<span class="prompt">$</span> flutter run -d chrome`, delay: 300 },
+  { html: `<span class="dim">Launching lib/main.dart on Chrome...</span>`, delay: 200 },
+  { html: `<span class="dim">Building portfolio...</span>`, delay: 350 },
+  { html: `<span class="ok">✓</span> Hot reload complete <span class="dim">(in 247ms)</span>`, delay: 280 },
+  { html: ``, delay: 100 },
+  { html: `<span class="accent">DevTools connected. Click any widget to inspect.</span>`, delay: 200 },
+];
+
+function bootSequence() {
+  const out = document.getElementById('boot-output');
+  // reduce-motion users: skip
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    finishBoot();
+    return;
+  }
+  let i = 0;
+  function next() {
+    if (i >= bootLines.length) {
+      setTimeout(finishBoot, 600);
+      return;
+    }
+    const line = bootLines[i++];
+    const div = document.createElement('div');
+    div.className = 'boot-line';
+    div.innerHTML = line.html || '&nbsp;';
+    out.appendChild(div);
+    setTimeout(next, line.delay);
+  }
+  next();
+}
+
+function finishBoot() {
+  document.getElementById('boot').classList.add('done');
+  document.getElementById('app').classList.add('ready');
+}
+
+/* ============================================================
+   TAB SWITCHING
+   ============================================================ */
+const appEl = document.getElementById('app');
+document.querySelectorAll('.tab[data-view]').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const view = tab.dataset.view;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    appEl.dataset.view = view;
+
+    if (view === 'performance') initPerformance();
+    if (view === 'console')     initConsole();
+  });
+});
+
+/* ============================================================
+   PERFORMANCE VIEW
+   ============================================================ */
+let perfState = {
+  initialized: false,
+  paused: false,
+  history: [],
+  startTime: Date.now(),
+  countersAnimated: false,
+};
+
+function initPerformance() {
+  if (perfState.initialized) return;
+  perfState.initialized = true;
+
+  // animate counters once
+  if (!perfState.countersAnimated) {
+    perfState.countersAnimated = true;
+    document.querySelectorAll('.career-card .big[data-target]').forEach(el => {
+      const target = parseInt(el.dataset.target, 10);
+      const suffix = el.dataset.suffix || '';
+      const duration = 1100;
+      const start = performance.now();
+      const startVal = 0;
+      function step(now) {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - t, 3);
+        const val = Math.round(startVal + (target - startVal) * eased);
+        const display = val >= 1000 ? val.toLocaleString() : val;
+        el.innerHTML = display + '<span class="unit">' + suffix + '</span>';
+        if (t < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  const canvas = document.getElementById('perf-chart');
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // seed history
+  if (perfState.history.length === 0) {
+    for (let i = 0; i < 80; i++) {
+      perfState.history.push(56 + Math.random() * 6);
+    }
+  }
+
+  function tick() {
+    if (appEl.dataset.view !== 'performance') return; // pause when off-tab
+
+    if (!perfState.paused) {
+      // generate realistic-ish FPS values - mostly 58-62, occasional dip
+      const r = Math.random();
+      let next;
+      if (r > 0.97) next = 32 + Math.random() * 12; // rare jank
+      else if (r > 0.92) next = 48 + Math.random() * 8;
+      else next = 56 + Math.random() * 6;
+      perfState.history.push(next);
+      if (perfState.history.length > 100) perfState.history.shift();
+
+      // update readouts
+      const current = perfState.history[perfState.history.length - 1];
+      const fpsTxt = Math.round(current);
+      document.getElementById('perf-fps').textContent = fpsTxt;
+      document.getElementById('perf-fps2').textContent = fpsTxt;
+      document.getElementById('perf-frame').textContent = (1000 / current).toFixed(1);
+      const jankCount = perfState.history.filter(v => v < 50).length;
+      document.getElementById('perf-jank').textContent = jankCount;
+      const upSec = Math.floor((Date.now() - perfState.startTime) / 1000);
+      document.getElementById('perf-uptime').textContent = upSec < 60 ? upSec + 's' : Math.floor(upSec / 60) + 'm ' + (upSec % 60) + 's';
+    }
+
+    // draw chart
+    const w = canvas.width / (window.devicePixelRatio || 1);
+    const h = canvas.height / (window.devicePixelRatio || 1);
+    ctx.clearRect(0, 0, w, h);
+
+    const len = perfState.history.length;
+    const stepX = w / (len - 1);
+    // map fps 0-120 to y; 60fps in middle, 120fps at 80% height
+    const yFromFps = (fps) => h - (Math.min(fps, 120) / 120) * h;
+
+    // gradient fill under line
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, 'rgba(84,197,248,0.25)');
+    grad.addColorStop(1, 'rgba(84,197,248,0.0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    for (let i = 0; i < len; i++) {
+      ctx.lineTo(i * stepX, yFromFps(perfState.history[i]));
+    }
+    ctx.lineTo(w, h);
+    ctx.closePath();
+    ctx.fill();
+
+    // line
+    ctx.lineWidth = 1.6;
+    ctx.strokeStyle = '#54C5F8';
+    ctx.shadowColor = 'rgba(84,197,248,0.55)';
+    ctx.shadowBlur = 4;
+    ctx.beginPath();
+    for (let i = 0; i < len; i++) {
+      const x = i * stepX;
+      const y = yFromFps(perfState.history[i]);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // jank markers
+    ctx.fillStyle = '#FF7A7A';
+    for (let i = 0; i < len; i++) {
+      if (perfState.history[i] < 50) {
+        const x = i * stepX;
+        const y = yFromFps(perfState.history[i]);
+        ctx.beginPath();
+        ctx.arc(x, y, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    setTimeout(() => requestAnimationFrame(tick), 90);
+  }
+  tick();
+
+  document.getElementById('perf-pause').addEventListener('click', (e) => {
+    perfState.paused = !perfState.paused;
+    e.target.textContent = perfState.paused ? '▶ resume' : '⏸ pause';
+  });
+}
+
+/* ============================================================
+   CONSOLE VIEW (interactive terminal)
+   ============================================================ */
+let consoleState = {
+  initialized: false,
+  history: [],
+  histIdx: -1,
+};
+
+function initConsole() {
+  const out = document.getElementById('console-output');
+  const input = document.getElementById('console-input');
+
+  if (!consoleState.initialized) {
+    consoleState.initialized = true;
+    // welcome banner
+    const banner = [
+      { html: `<span class="ascii flutter">    ___ __     __  __
+   / __/ /_ __ / /_/ /____ ____
+  / _// / // // __/ __/ -_) __/
+ /_/ /_/\\_,_/\\__/\\__/\\__/_/      v3.x</span>` },
+      { c: 'muted', t: 'Welcome to jay-shell · The Flutter Developer\'s portfolio terminal' },
+      { c: 'dim',   t: 'Type "help" for available commands. Try "flutter doctor" or "git log".' },
+      { c: 'dim',   t: '' },
+    ];
+    banner.forEach(b => append(b));
+    setTimeout(() => input.focus(), 50);
+  } else {
+    setTimeout(() => input.focus(), 50);
+  }
+
+  // command map
+  const commands = {
+    help: () => [
+      { c: 'amber',   t: 'Available commands:' },
+      { c: 'dim',     t: '' },
+      { html: '  <span class="flutter">help</span>             show this menu' },
+      { html: '  <span class="flutter">whoami</span>           who is jay?' },
+      { html: '  <span class="flutter">flutter doctor</span>   environment check' },
+      { html: '  <span class="flutter">git log</span>          career history as commits' },
+      { html: '  <span class="flutter">cat about.md</span>     read the about file' },
+      { html: '  <span class="flutter">ls projects/</span>     list projects' },
+      { html: '  <span class="flutter">cat projects/&lt;name&gt;</span>  e.g. cat projects/terra' },
+      { html: '  <span class="flutter">skills</span>           show skills' },
+      { html: '  <span class="flutter">contact</span>          contact info' },
+      { html: '  <span class="flutter">resume</span>           download resume' },
+      { html: '  <span class="flutter">github</span>           open GitHub' },
+      { html: '  <span class="flutter">linkedin</span>         open LinkedIn' },
+      { html: '  <span class="flutter">echo &lt;text&gt;</span>      print text' },
+      { html: '  <span class="flutter">date</span>             current time' },
+      { html: '  <span class="flutter">clear</span>            clear terminal' },
+      { html: '  <span class="flutter">sudo hire-jay</span>    🔥' },
+      { c: 'dim', t: '' },
+      { c: 'dim', t: 'Tip: ↑/↓ for history. Tab is just a tab. Esc to focus input.' },
+    ],
+
+    whoami: () => [
+      { c: 'flutter', t: 'jay gajjar' },
+      { c: 'muted',   t: 'mobile app developer · 5+ years · flutter & cross-platform' },
+      { c: 'muted',   t: 'currently @ terra.do · based in surat, gujarat' },
+    ],
+
+    'flutter': () => [
+      { c: 'warn', t: 'Usage: flutter <command>' },
+      { c: 'dim',  t: 'Try: flutter doctor' },
+    ],
+    'flutter doctor': () => [
+      { c: 'flutter', t: 'Doctor summary (to see all details, run flutter doctor -v):' },
+      { html: '<span class="ok">[✓]</span> Flutter <span class="dim">(stable channel · 5+ years experience)</span>' },
+      { html: '<span class="ok">[✓]</span> Dart <span class="dim">(fluent · null-safe · async-await master)</span>' },
+      { html: '<span class="ok">[✓]</span> Android toolchain <span class="dim">(Play Store · APK · flavors)</span>' },
+      { html: '<span class="ok">[✓]</span> Xcode <span class="dim">(TestFlight · App Store · IPA)</span>' },
+      { html: '<span class="ok">[✓]</span> State management <span class="dim">(Bloc · GetX · Provider)</span>' },
+      { html: '<span class="ok">[✓]</span> Backend <span class="dim">(Firebase · Firestore · GCP)</span>' },
+      { html: '<span class="ok">[✓]</span> AI integrations <span class="dim">(LLM APIs · TTS · recommenders)</span>' },
+      { html: '<span class="ok">[✓]</span> CI/CD <span class="dim">(GitHub Actions · Codemagic · Buddy)</span>' },
+      { c: 'dim', t: '' },
+      { c: 'ok',  t: '• No issues found!' },
+    ],
+
+    'git': () => [
+      { c: 'warn', t: 'Usage: git <command>' },
+      { c: 'dim',  t: 'Try: git log' },
+    ],
+    'git log': () => [
+      { html: '<span class="amber">commit a7f3c2b</span> <span class="dim">(HEAD -> main, origin/main)</span>' },
+      { html: 'Author: Jay Gajjar &lt;gajjarjay52@gmail.com&gt;' },
+      { html: 'Date:   Oct 2021 — Present' },
+      { html: '' },
+      { html: '    <span class="flutter">feat(terra.do):</span> ship AI features, scale to thousands of learners' },
+      { html: '' },
+      { html: '<span class="amber">commit 5d1e982</span>' },
+      { html: 'Date:   Feb 2021 — Oct 2021' },
+      { html: '' },
+      { html: '    <span class="flutter">feat(universe-tech):</span> lead ionic→flutter migration, +40% release speed' },
+      { html: '' },
+      { html: '<span class="amber">commit 2a09f1c</span>' },
+      { html: 'Date:   2017 — 2020' },
+      { html: '' },
+      { html: '    <span class="flutter">init:</span> bachelor of computer application @ vnsgu, surat' },
+      { html: '' },
+      { c: 'dim', t: '(end of log)' },
+    ],
+
+    'cat': (args) => {
+      if (!args.length) return [{ c: 'err', t: 'cat: missing file operand' }];
+      const file = args[0];
+      if (file === 'about.md' || file === 'about') {
+        return [
+          { html: '<span class="purple"># About Jay</span>' },
+          { html: '' },
+          { html: 'Mobile App Developer with <strong>5+ years</strong> of hands-on experience' },
+          { html: 'building <strong>Flutter</strong> and cross-platform apps that ship on time,' },
+          { html: 'scale clean, and feel great to use.' },
+          { html: '' },
+          { html: 'Specializes in <strong>state management</strong>, <strong>performance</strong>,' },
+          { html: 'and <strong>scalable architecture</strong> — with growing expertise in' },
+          { html: '<strong>AI integrations</strong> and <strong>cloud infrastructure</strong>.' },
+          { html: '' },
+          { html: 'Currently bridging mobile + AI at <span class="flutter">Terra.do</span>.' },
+        ];
+      }
+      if (file.startsWith('projects/')) {
+        const proj = file.split('/')[1];
+        if (proj === 'terra' || proj === 'terra.do') return projDetails.terra;
+        if (proj === 'school' || proj === 'face') return projDetails.face;
+        if (proj === 'migration' || proj === 'ionic') return projDetails.migration;
+        return [{ c: 'err', t: 'cat: ' + file + ': No such file. Try `ls projects/`' }];
+      }
+      return [{ c: 'err', t: 'cat: ' + file + ': No such file or directory' }];
+    },
+
+    'ls': (args) => {
+      const path = args[0] || '.';
+      if (path === '.' || path === './') {
+        return [
+          { html: '<span class="purple">about.md</span>   <span class="purple">contact.md</span>   <span class="flutter">projects/</span>   <span class="flutter">skills/</span>   <span class="flutter">experience/</span>' }
+        ];
+      }
+      if (path === 'projects/' || path === 'projects') {
+        return [
+          { html: '<span class="purple">terra</span>         <span class="dim"># climate-tech learning app · Flutter</span>' },
+          { html: '<span class="purple">face</span>          <span class="dim"># on-device face recognition for school app</span>' },
+          { html: '<span class="purple">migration</span>     <span class="dim"># ionic → flutter migration</span>' },
+        ];
+      }
+      return [{ c: 'err', t: 'ls: cannot access \'' + path + '\': No such file or directory' }];
+    },
+
+    skills: () => [
+      { c: 'amber', t: 'Skills loaded:' },
+      { html: '  <span class="flutter">mobile</span>    Flutter · Dart · Bloc · GetX · Provider · Flutter Web · Flavors' },
+      { html: '  <span class="flutter">ai</span>        LLM APIs (OpenAI/Gemini) · Recommendation Systems · TTS' },
+      { html: '  <span class="flutter">backend</span>   Firebase · Firestore · Realtime DB · Node.js · REST APIs · SQL · NoSQL' },
+      { html: '  <span class="flutter">cloud</span>     Google Cloud · VPC · Load Balancer · Pub/Sub · Cloud Functions · VM' },
+      { html: '  <span class="flutter">devops</span>    GitHub Actions · Codemagic · Buddy · TestFlight · Play Store' },
+      { html: '  <span class="flutter">tools</span>     GetStream · Flagsmith · Sentry · MixPanel · RudderStack · Intercom' },
+    ],
+
+    contact: () => [
+      { c: 'amber', t: 'Contact channels:' },
+      { html: '  <span class="dim">email   </span> <a href="mailto:gajjarjay52@gmail.com">gajjarjay52@gmail.com</a>' },
+      { html: '  <span class="dim">phone   </span> <a href="tel:+919574182452">+91 9574182452</a>' },
+      { html: '  <span class="dim">github  </span> <a href="https://github.com/j-j-gajjar" target="_blank">github.com/j-j-gajjar</a>' },
+      { html: '  <span class="dim">linkedin</span> <a href="https://www.linkedin.com/in/jjgajjar" target="_blank">linkedin.com/in/jjgajjar</a>' },
+    ],
+
+    resume: () => {
+      setTimeout(() => {
+        const a = document.createElement('a');
+        a.href = './jay_gajjar_resume.pdf';
+        a.download = 'jay_gajjar_resume.pdf';
+        a.click();
+      }, 250);
+      return [
+        { c: 'ok', t: '✓ downloading jay_gajjar_resume.pdf...' },
+        { c: 'dim', t: '(check your downloads folder)' },
+      ];
+    },
+
+    github: () => {
+      setTimeout(() => window.open(ME.github, '_blank'), 200);
+      return [{ c: 'ok', t: '✓ opening ' + ME.github + ' in new tab...' }];
+    },
+    linkedin: () => {
+      setTimeout(() => window.open(ME.linkedin, '_blank'), 200);
+      return [{ c: 'ok', t: '✓ opening ' + ME.linkedin + ' in new tab...' }];
+    },
+
+    echo: (args) => [{ t: args.join(' ') }],
+
+    date: () => [{ c: 'muted', t: new Date().toString() }],
+
+    clear: () => { out.innerHTML = ''; return null; },
+    cls:   () => { out.innerHTML = ''; return null; },
+
+    'sudo hire-jay': () => [
+      { c: 'amber', t: '[sudo] password for recruiter: ********' },
+      { c: 'ok', t: '✓ Authentication successful' },
+      { html: '' },
+      { html: '<span class="ascii pink">  ┌─────────────────────────────────────┐\n  │  🚀  GREAT CHOICE.                  │\n  │                                     │\n  │  reach out: gajjarjay52@gmail.com   │\n  └─────────────────────────────────────┘</span>' },
+    ],
+
+    exit: () => [
+      { c: 'dim', t: 'Cannot exit. The portfolio is the program.' },
+      { c: 'dim', t: '(but you can switch tabs at the top ↑)' },
+    ],
+
+    flutter_run: () => [
+      { c: 'dim', t: 'Launching jay_gajjar.dart on Chrome...' },
+      { c: 'ok',  t: '✓ Hot reload complete (in 247ms).' },
+      { c: 'flutter', t: 'Already running, my friend.' },
+    ],
+  };
+
+  const projDetails = {
+    terra: [
+      { c: 'amber', t: '# Terra.do — Climate Education Mobile App' },
+      { html: '' },
+      { html: 'Cross-platform Flutter app for cohort-based climate learning.' },
+      { html: '' },
+      { html: '<span class="flutter">stack:</span> Flutter · Bloc · GetX · Firebase · GetStream · GCP · OpenAI/Gemini' },
+      { html: '<span class="flutter">role:</span>  core mobile engineer · end-to-end ownership' },
+      { html: '<span class="flutter">since:</span> Oct 2021' },
+      { html: '' },
+      { html: 'highlights:' },
+      { html: '  • <strong>AI course recommendations</strong> from user history' },
+      { html: '  • <strong>Personalized learning pathways</strong> generation' },
+      { html: '  • <strong>TTS audio pipeline</strong> for course content' },
+      { html: '  • Chat, community, real-time engagement' },
+    ],
+    face: [
+      { c: 'amber', t: '# School App — On-Device Face Recognition' },
+      { html: '' },
+      { html: 'Privacy-first attendance/identification module.' },
+      { html: '' },
+      { html: '<span class="flutter">stack:</span> Flutter · Dart · third-party recognition lib · local storage' },
+      { html: '' },
+      { html: 'highlights:' },
+      { html: '  • Matches <strong>1,000+ stored faces locally</strong> in seconds' },
+      { html: '  • Fully on-device — zero cloud cost' },
+      { html: '  • Full data privacy · offline-capable' },
+    ],
+    migration: [
+      { c: 'amber', t: '# Ionic → Flutter Migration' },
+      { html: '' },
+      { html: 'Re-architected a production Ionic app to Flutter from the ground up.' },
+      { html: '' },
+      { html: '<span class="flutter">stack:</span> Flutter · Dart · Firebase · Flutter Flavors' },
+      { html: '<span class="flutter">when:</span>  Feb–Oct 2021 @ Universe Technologies' },
+      { html: '' },
+      { html: 'wins:' },
+      { html: '  • Release speed up <strong>~40%</strong> via Flutter flavors' },
+      { html: '  • Performance lift <strong>~25%</strong> via profiling' },
+      { html: '  • Cleaner maintainability, single codebase' },
+    ],
+  };
+
+  function append(line) {
+    const div = document.createElement('div');
+    div.className = 'console-line' + (line.c ? ' ' + line.c : '');
+    if (line.html !== undefined) div.innerHTML = line.html;
+    else if (line.t !== undefined) div.textContent = line.t;
+    else div.innerHTML = '&nbsp;';
+    out.appendChild(div);
+    out.scrollTop = out.scrollHeight;
+  }
+
+  function runCommand(raw) {
+    const trimmed = raw.trim();
+    // print the prompt line with command
+    append({
+      c: 'cmd',
+      html: '<span class="pre">jay@portfolio</span><span class="at">:</span><span class="path">~/portfolio</span><span class="at">$</span> <span class="input">' + escapeHtml(trimmed) + '</span>',
+    });
+
+    if (!trimmed) return;
+
+    consoleState.history.push(trimmed);
+    consoleState.histIdx = consoleState.history.length;
+
+    // try multi-word commands first
+    const lower = trimmed.toLowerCase();
+    let handler = null;
+    let args = [];
+
+    // exact multi-word matches
+    const multi = ['flutter doctor', 'git log', 'sudo hire-jay', 'flutter run'];
+    let matched = multi.find(m => lower === m || lower.startsWith(m + ' '));
+    if (matched) {
+      handler = commands[matched] || commands[matched.replace(' ', '_')];
+      const rest = trimmed.slice(matched.length).trim();
+      args = rest ? rest.split(/\s+/) : [];
+    } else {
+      const parts = trimmed.split(/\s+/);
+      const cmd = parts[0].toLowerCase();
+      args = parts.slice(1);
+      handler = commands[cmd];
+    }
+
+    if (!handler) {
+      append({ c: 'err', t: 'command not found: ' + trimmed.split(/\s+/)[0] });
+      append({ c: 'dim', t: 'type "help" for available commands' });
+      return;
+    }
+
+    const result = handler(args);
+    if (result) result.forEach(append);
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // input handler — only attach once
+  if (!input.dataset.bound) {
+    input.dataset.bound = '1';
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const v = input.value;
+        input.value = '';
+        runCommand(v);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (consoleState.history.length === 0) return;
+        consoleState.histIdx = Math.max(0, consoleState.histIdx - 1);
+        input.value = consoleState.history[consoleState.histIdx] || '';
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (consoleState.histIdx >= consoleState.history.length - 1) {
+          consoleState.histIdx = consoleState.history.length;
+          input.value = '';
+        } else {
+          consoleState.histIdx++;
+          input.value = consoleState.history[consoleState.histIdx] || '';
+        }
+      } else if (e.key === 'l' && e.ctrlKey) {
+        e.preventDefault();
+        out.innerHTML = '';
+      }
+    });
+
+    // click anywhere in console window focuses input
+    document.querySelector('.console-window').addEventListener('click', (e) => {
+      if (window.getSelection().toString()) return; // don't steal focus on text-select
+      input.focus();
+    });
+  }
+}
+
+// Esc key focuses console input when on console tab
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && appEl.dataset.view === 'console') {
+    document.getElementById('console-input')?.focus();
+  }
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.getElementById('tree').innerHTML = renderTree(tree);
+attachNodeHandlers();
+showDetail('welcome');
+bootSequence();
+</script>
+
 </body>
-
 </html>
